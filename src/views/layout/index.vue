@@ -71,6 +71,7 @@
         overflow: hidden;
       }
       .main-wrapper {
+        position: relative;
         height: calc(100% - 85px);
         overflow-x: hidden;
         overflow-y: auto;

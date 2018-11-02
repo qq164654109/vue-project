@@ -1,6 +1,6 @@
 <template>
     <div class="img-upload">
-      aaaa
+      aaaag
     </div>
 </template>
 

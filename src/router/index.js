@@ -130,6 +130,16 @@ export const asyncRoutes = [
         name: 'toolsImageUploadDemo',
         component: () => import('@/views/tools/imageUploadDemo')
       },
+      {
+        path: '/tools/stickyDemo',
+        name: 'toolsStickyDemo',
+        component: () => import('@/views/tools/stickyDemo')
+      },
+      {
+        path: '/tools/lazyLoadSelectDemo',
+        name: 'toolsLazyLoadSelectDemo',
+        component: () => import('@/views/tools/lazyLoadSelectDemo')
+      }
     ]
   },
   {

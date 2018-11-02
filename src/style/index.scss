@@ -30,6 +30,10 @@ div:focus{
   cursor: pointer;
 }
 
+.sticky {
+  position: fixed !important;
+}
+
 .text-truncate {
   overflow: hidden;
   text-overflow: ellipsis;

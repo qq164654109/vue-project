@@ -15,7 +15,9 @@ export default {
     toolsMarkDownDemo: 'MarkDown Demo',
     toolsJsonEditorDemo: 'JsonEditor Demo',
     toolsSplitPaneDemo: 'SplitPane Demo',
-    toolsImageUploadDemo: 'ImageUpload Demo'
+    toolsImageUploadDemo: 'ImageUpload Demo',
+    toolsStickyDemo: 'Sticky Demo',
+    toolsLazyLoadSelectDemo: 'LazyLoadSelect Demo'
   },
   navbar: {
     dashboard: 'dashboard',

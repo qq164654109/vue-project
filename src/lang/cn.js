@@ -15,7 +15,9 @@ export default {
     toolsMarkDownDemo: 'MarkDown',
     toolsJsonEditorDemo: 'JsonEditor',
     toolsSplitPaneDemo: '分割板',
-    toolsImageUploadDemo: '图片上传'
+    toolsImageUploadDemo: '图片上传',
+    toolsStickyDemo: '吸附',
+    toolsLazyLoadSelectDemo: '懒加载选择框'
   },
   navbar: {
     dashboard: '首页',

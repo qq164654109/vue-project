@@ -13,8 +13,7 @@ Vue.directive('scrollLoadSelect', {
       if ($selectWrap.scrollHeight - $selectWrap.scrollTop <= $selectWrap.clientHeight && !loading){
         loading = true;
         let $selectLoadWrap = document.createElement('div');
-        $selectLoadWrap.classList.add('el-scrollbar__Load');
-        $selectLoadWrap.style.top = $selectWrap.scrollTop + 'px';
+        $selectLoadWrap.classList.add('el-select__Load');
         let $selectLoadIcon = document.createElement('span');
         $selectLoadIcon.classList.add('el-icon-loading');
         $selectLoadWrap.appendChild($selectLoadIcon);

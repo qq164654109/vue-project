@@ -13,10 +13,10 @@
 
 <script>
   import { mapGetters } from 'vuex';
-  import sidebar from './sidebar';
-  import navbar from './navbar';
-  import tagsView from './tagsView';
-  import routerMain from './routerMain';
+  import sidebar from './modules/sidebar';
+  import navbar from './modules/navbar';
+  import tagsView from './modules/tagsView';
+  import routerMain from './modules/routerMain';
 
   export default {
     computed: {
@@ -39,20 +39,26 @@
     position: relative;
     width: 100%;
     height: 100%;
-    padding-left: 180px;
+    padding-left: 200px;
     overflow: hidden;
     transition: padding-left .3s;
     &.closeSidebar {
       padding-left: 64px;
+      .sidebar-wrapper {
+        width: 64px;
+      }
+      .horizontal-collapse-transition {
+        transition: 0s width ease-in-out, 0s padding-left ease-in-out, 0s padding-right ease-in-out;
+      }
     }
     .sidebar-wrapper {
       position: absolute;
       top: 0;
       left: 0;
+      width: 200px;
       height: 100%;
       background: #363F5E;
-      overflow-x: hidden;
-      overflow-y: auto;
+      overflow: hidden;
     }
     .content-wrapper {
       width: 100%;

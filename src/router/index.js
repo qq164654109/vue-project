@@ -139,6 +139,16 @@ export const asyncRoutes = [
         path: '/tools/lazyLoadSelectDemo',
         name: 'toolsLazyLoadSelectDemo',
         component: () => import('@/views/tools/lazyLoadSelectDemo')
+      },
+      {
+        path: '/tools/dragDialogDemo',
+        name: 'toolsDragDialogDemo',
+        component: () => import('@/views/tools/dragDialogDemo')
+      },
+      {
+        path: '/tools/dragListDemo',
+        name: 'toolsDragListDemo',
+        component: () => import('@/views/tools/dragListDemo')
       }
     ]
   },

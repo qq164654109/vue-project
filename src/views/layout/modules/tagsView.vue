@@ -1,6 +1,6 @@
 <template>
   <div class="tags-view">
-    <ul class="tags-list">
+    <draggable element="ul" class="tags-list" :list="routeTags">
       <li v-for="tag in routeTags" :key="tag.name" class="tags-item" :class="{'active': tag.name === $route.name}">
         <link-to :to="{ name: tag.name }">
           <span v-show="tag.name === $route.name" class="cycle"></span>
@@ -8,13 +8,13 @@
           <i class="el-icon-close" @click.stop="delRouteTags(tag)"></i>
         </link-to>
       </li>
-    </ul>
+    </draggable>
   </div>
 </template>
 
 <script>
   import { mapGetters, mapMutations } from 'vuex';
-  import scrollPane from '@/components/scrollPane/index';
+  import draggable from 'vuedraggable';
 
   export default {
     computed: {
@@ -37,7 +37,7 @@
       this.addRouteTags(this.$route);
     },
     components: {
-      scrollPane
+      draggable
     }
   }
 

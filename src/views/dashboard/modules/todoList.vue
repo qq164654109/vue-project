@@ -10,13 +10,13 @@
     <div class="content">
       <ul class="list">
         <li v-for="item in filterLists" :key="item.key" class="list-item" :class="{'list-item-checked': item.status === 'done'}">
-            <span @click="checkTodo(item.key)" class="checkbox">
-              <i class="el-icon-check"></i>
-            </span>
+          <span @click="checkTodo(item.key)" class="checkbox">
+            <i class="el-icon-check"></i>
+          </span>
           {{item.title}}
           <span class="del" @click="delList(item.key)">
-              <i class="el-icon-delete"></i>
-            </span>
+            <i class="el-icon-delete"></i>
+          </span>
         </li>
       </ul>
     </div>
@@ -191,8 +191,7 @@
     }
     .content {
       height: 360px;
-      overflow-x: hidden;
-      overflow-y: auto;
+      overflow: hidden;
       .list-scrollbar {
         width: calc(100% + 1px);
         height: 100%;

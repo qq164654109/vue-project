@@ -32,3 +32,12 @@ export function debounce(func, wait, immediate) {
     return result;
   };
 };
+
+// 获取原有属性 ie dom元素.currentStyle 火狐谷歌 window.getComputedStyle(dom元素, null);
+export function getStyle (dom, attr) {
+  if (window.document.currentStyle) {
+    return dom.currentStyle[attr]
+  } else {
+    return getComputedStyle(dom, false)[attr]
+  }
+}

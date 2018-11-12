@@ -38,13 +38,13 @@
 </template>
 
 <script>
-  import countCards from './components/countCards';
+  import countCards from './modules/countCards';
   import lineChart from '@/components/charts/lineChart';
   import radarChart from '@/components/charts/radarChart';
   import pieChart from '@/components/charts/pieChart';
   import barChart from '@/components/charts/barChart';
-  import orderTable from './components/orderTable';
-  import todoList from './components/todoList';
+  import orderTable from './modules/orderTable';
+  import todoList from './modules/todoList';
 
   import { lineOptions, radarOptions, pieOptions, barOptions } from "./chartsOptions";
 

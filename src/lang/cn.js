@@ -17,7 +17,9 @@ export default {
     toolsSplitPaneDemo: '分割板',
     toolsImageUploadDemo: '图片上传',
     toolsStickyDemo: '吸附',
-    toolsLazyLoadSelectDemo: '懒加载选择框'
+    toolsLazyLoadSelectDemo: '懒加载选择框',
+    toolsDragDialogDemo: '可拖拽弹窗',
+    toolsDragListDemo: '拖拽列表'
   },
   navbar: {
     dashboard: '首页',

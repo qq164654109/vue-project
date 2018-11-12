@@ -17,7 +17,9 @@ export default {
     toolsSplitPaneDemo: 'SplitPane Demo',
     toolsImageUploadDemo: 'ImageUpload Demo',
     toolsStickyDemo: 'Sticky Demo',
-    toolsLazyLoadSelectDemo: 'LazyLoadSelect Demo'
+    toolsLazyLoadSelectDemo: 'LazyLoadSelect Demo',
+    toolsDragDialogDemo: 'DragDialog Demo',
+    toolsDragListDemo: 'DragList Demo'
   },
   navbar: {
     dashboard: 'dashboard',

@@ -13,7 +13,7 @@
       <lang-select class="lang-wrapper"></lang-select>
       <el-dropdown class="avatar-wrapper" trigger="click" @command="onCommand">
         <div class="avatar pointer">
-          <img src="../../../static/images/avatar.gif" width="40" height="40" alt="">
+          <img src="../../../../static/images/avatar.gif" width="40" height="40" alt="">
           <i class="el-icon-caret-bottom"></i>
         </div>
         <el-dropdown-menu slot="dropdown">

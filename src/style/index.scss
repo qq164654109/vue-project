@@ -34,6 +34,10 @@ div:focus{
   position: fixed !important;
 }
 
+.draggable {
+  cursor: move;
+}
+
 .text-truncate {
   overflow: hidden;
   text-overflow: ellipsis;

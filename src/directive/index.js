@@ -3,6 +3,7 @@ import store from '@/store';
 import './sticky.js';
 import './lazyLoadSelect';
 import './scrollLoadSelect';
+import './dragDialog';
 function hasPermission(authRoles) {
   const userRoles = store.getters.roles;
   return userRoles.some(role => authRoles.includes(role));

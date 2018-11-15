@@ -1,6 +1,8 @@
 <template>
   <div class="drag-list-demo">
-    <drag-check-list :check-list="checkList" :checked-list="checkedList"></drag-check-list>
+    <div class="drag-wrapper">
+      <drag-check-list :check-list="checkList" :checked-list="checkedList"></drag-check-list>
+    </div>
   </div>
 </template>
 
@@ -35,6 +37,10 @@
 
 <style lang="scss" scoped>
   .drag-list-demo {
-    padding: 50px 450px;
+    padding: 30px 50px;
+    .drag-wrapper {
+      width: 700px;
+      margin: 0 auto;
+    }
   }
 </style>

@@ -2,7 +2,7 @@
   <div class="count-cards">
     <el-row :gutter="30">
       <el-col :span="6" v-for="(card, i) in cardData" :key="i">
-        <div class="card">
+        <div class="card" @click="a">
           <div class="sign" :class="'sign-'+ card.txt"><i :class="'el-icon-' + card.icon"></i></div>
           <div class="info">
             <div class="txt">{{$t('dashboard.' + card.txt)}}</div>
@@ -44,6 +44,13 @@
             num: 723
           }
         ]
+      }
+    },
+    mounted() {
+    },
+    methods: {
+      a() {
+        window.parent.postMessage('GIS','http://0.0.0.0:8007');
       }
     },
     components: {

@@ -31,7 +31,7 @@
       setTimeout(() => {
         this.content = `<h2 style="text-align: center;color: #409eff;">初始化成功</h2>
             <p style="text-align: center;"><img src="../../../static/images/avatar.gif" alt=""></p>
-            <h2 style="text-align: center;color: #E45F47;">郑康个傻逼</h2>`
+            <h2 style="text-align: center;color: #E45F47;">郑康个丑逼</h2>`
       }, 200)
     },
     components: {

@@ -1,20 +1,48 @@
 <template>
   <div class="drag-check-list">
     <div class="left">
-      <div class="title">可选项目</div>
-      <draggable element="ul" class="left-list" :options="{group:'list', dragClass: 'active'}" :list="filterList">
-        <li class="item" v-for="item in filterList" :key="item.key">
-          {{item.label}} <span @click.stop="handleCheck(item)" class="del el-icon-check"></span>
-        </li>
-      </draggable>
+      <div class="title">
+        可选项目
+        <span class="check-group">
+           <el-checkbox :indeterminate="leftCheckStatus" v-model="isLeftCheckedAll" @change="leftHandleCheckAll">&nbsp;</el-checkbox>
+        </span>
+      </div>
+      <el-checkbox-group v-model="leftCheckedGroup" size="small" @change="leftHandleCheckedChange">
+        <draggable element="ul" class="list" :options="{group:'checklist', dragClass: 'active'}" :list="filterList">
+          <li class="item" v-for="item in filterList" :key="item.key">
+            {{item.label}}
+            <span class="check-btn">
+              <el-checkbox :label="item" :key="item.key">&nbsp;</el-checkbox>
+            </span>
+          </li>
+        </draggable>
+      </el-checkbox-group>
+    </div>
+    <div class="center">
+      <div class="to-checked-btn" @click="toChecked">
+        <i class="el-icon-arrow-right"></i>
+      </div>
+      <div class="to-uncheck-btn" @click="toUnchecked">
+        <i class="el-icon-arrow-left"></i>
+      </div>
     </div>
     <div class="right">
-      <div class="title">选择项目</div>
-      <draggable element="ul" class="right-list" :options="{group:'list'}" :list="checkedList">
+      <div class="title">
+        选择项目
+        <span class="check-group">
+           <el-checkbox :indeterminate="rightCheckStatus" v-model="isRightCheckedAll" @change="rightHandleCheckAll">&nbsp;</el-checkbox>
+            </span>
+    </div>
+    <el-checkbox-group v-model="rightCheckedGroup" size="small" @change="rightHandleCheckedChange">
+      <draggable element="ul" class="list" :options="{group:'checklist'}" :list="checkedList">
         <li class="item" v-for="item in checkedList" :key="item.key">
-          {{item.label}} <span @click="handleCancle(item)" class="del el-icon-back"></span>
-        </li>
-      </draggable>
+          {{item.label}}
+            <span class="check-btn">
+              <el-checkbox :label="item" :key="item.key">&nbsp;</el-checkbox>
+            </span>
+          </li>
+        </draggable>
+      </el-checkbox-group>
     </div>
   </div>
 </template>
@@ -37,17 +65,53 @@
         }
       }
     },
+    data() {
+      return {
+        leftCheckStatus: false,
+        rightCheckStatus: false,
+        isLeftCheckedAll: false,
+        isRightCheckedAll: false,
+        leftCheckedGroup: [],
+        rightCheckedGroup: []
+      }
+    },
     methods: {
+      leftHandleCheckAll(val) {
+        this.leftCheckedGroup = val ? [...this.filterList] : [];
+        this.leftCheckStatus = false;
+      },
+      leftHandleCheckedChange(val) {
+        let count = val.length;
+        this.isLeftCheckedAll = count === this.filterList.length;
+        this.leftCheckStatus = count > 0 && count < this.filterList.length;
+      },
+      rightHandleCheckAll(val) {
+        this.rightCheckedGroup = val ? [...this.checkedList] : [];
+        this.rightCheckStatus = false;
+      },
+      rightHandleCheckedChange(val) {
+        let count = val.length;
+        this.isRightCheckedAll = count === this.checkedList.length;
+        this.rightCheckStatus = count > 0 && count < this.checkedList.length;
+      },
+      toChecked() {
+        console.log(this.checkedList);
+        this.checkedList = this.checkedList.concat(this.leftCheckedGroup);
+        this.leftCheckedGroup = [];
+      },
+      toUnchecked() {
+        this.rightCheckedGroup.forEach(item => {
+          for (let i = this.checkedList.length - 1; i >= 0; i--) {
+            console.log(this.checkedList[i].key, item.key)
+            if (item.key === this.checkedList[i].key) {
+              this.checkedList.splice(i, 1)
+            }
+          }
+        })
+        this.rightCheckedGroup = [];
+      },
       handleCheck(item) {
         this.checkedList.push(item);
-      },
-      handleCancle(item) {
-        for (const [index, ele] of this.checkedList.entries()) {
-          if (item.key === ele.key) {
-            this.checkedList.splice(index, 1);
-            break;
-          }
-        }
       },
       push(item) {
         this.list1.push(item);
@@ -77,25 +141,30 @@
 
 <style lang="scss" scoped>
   .drag-check-list {
+    display: flex;
+    align-items: center;
     width: 100%;
     .left, .right {
-      float: left;
-      width: 50%;
+      flex: 1;
       height: 500px;
       padding: 20px 30px;
       .title {
-        height: 40px;
+        height: 50px;
         padding: 0 20px;
-        line-height: 40px;
+        line-height: 50px;
         font-size: 16px;
         color: #fff;
-        background-color: #409eff;
+        background-color: #67C23A;
         border-radius: 4px;
-        margin-bottom: 15px;
+        .check-group {
+          float: right;
+          display: inline-block;
+        }
       }
     }
-    .left {
-      border-right: 1px solid #409eff;
+    .list {
+      background-color: #F0F0F0;
+      padding: 10px 15px;
     }
     .active {
       background-color: #409eff;
@@ -103,15 +172,17 @@
       opacity: 1;
     }
     .item {
-      height: 40px;
+      width: 100%;
+      height: 64px;
+      margin-bottom: 15px;
       padding: 0 20px;
-      line-height: 40px;
+      line-height: 64px;
       font-size: 16px;
       color: #333;
-      border: 1px solid #ebebeb;
       border-radius: 4px;
       cursor: move;
-      margin-bottom: 15px;
+      background-color: #fff;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       &:last-child {
         margin-bottom: 0;
       }
@@ -123,11 +194,33 @@
         background: #409eff;
         color: #fff;
       }
-      .del {
-        display: inline-block;
-        height: 100%;
-        line-height: 40px;
+      .check-btn {
         float: right;
+        display: inline-block;
+      }
+    }
+    .center {
+      flex: 0 0 36px;
+      .to-checked-btn {
+        margin-bottom: 15px;
+      }
+      .to-checked-btn.is-active {
+        background: #67C23A;
+        color: #fff;
+      }
+      .to-uncheck-btn.is-active {
+        background: #409eff;
+        color: #fff;
+      }
+      .to-checked-btn, .to-uncheck-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 18px;
+        text-align: center;
+        line-height: 36px;
+        border: 1px solid #ebeef5;
+        background-color: #f5f7fa;
+        border-radius: 50%;
         cursor: pointer;
       }
     }

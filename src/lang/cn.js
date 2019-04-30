@@ -19,7 +19,12 @@ export default {
     toolsStickyDemo: '吸附',
     toolsLazyLoadSelectDemo: '懒加载选择框',
     toolsDragDialogDemo: '可拖拽弹窗',
-    toolsDragListDemo: '拖拽列表'
+    toolsDragListDemo: '拖拽列表',
+    toolsCalendarDemo: '日历',
+    hightopo: '图扑软件',
+    hightopoDrawing: '设计器',
+    hightopoNode: '图元',
+    leaflet: 'Leaflet'
   },
   navbar: {
     dashboard: '首页',

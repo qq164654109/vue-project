@@ -1,3 +1,55 @@
+String.prototype.colorRgb = function(opacity = 1){
+  const reg = /^#([0-9a-fA-f]{3}|[0-9a-fA-f]{6})$/;
+  let sColor = this.toLowerCase();
+    if(sColor && reg.test(sColor)){
+        if(sColor.length === 4){
+            let sColorNew = "#";
+            for(let i=1; i<4; i+=1){
+                sColorNew += sColor.slice(i,i+1).concat(sColor.slice(i,i+1));
+            }
+            sColor = sColorNew;
+        }
+        //处理六位的颜色值
+        let sColorChange = [];
+        for(let i=1; i<7; i+=2){
+            sColorChange.push(parseInt("0x"+sColor.slice(i,i+2)));
+        }
+        return "RGBA(" + sColorChange.join(",") + ","+ opacity+")";
+    }else{
+        return sColor;
+    }
+};
+
+Date.prototype.formate = function (fmt) {
+    if (this.getTime() === 0 || isNaN(this.getTime())) {
+        return '';
+    }
+    let o = {
+        "M+" : this.getMonth()+1,                 //月份
+        "d+" : this.getDate(),                    //日
+        "h+" : this.getHours(),                   //小时
+        "m+" : this.getMinutes(),                 //分
+        "s+" : this.getSeconds(),                 //秒
+        "q+" : Math.floor((this.getMonth()+3)/3), //季度
+        "S"  : this.getMilliseconds()             //毫秒
+    };
+    if(/(y+)/.test(fmt))
+        fmt=fmt.replace(RegExp.$1, (this.getFullYear()+"").substr(4 - RegExp.$1.length));
+    for(var k in o)
+        if(new RegExp("("+ k +")").test(fmt))
+            fmt = fmt.replace(RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));
+    return fmt;
+};
+
+Date.prototype.getMonthDays = function () {
+    const year = this.getFullYear();
+    const month = this.getMonth();
+
+    let d = new Date(year, month, 0);
+
+    return d.getDate();
+};
+
 export function debounce(func, wait, immediate) {
   let timeout, args, context, timestamp, result;
 
@@ -40,4 +92,12 @@ export function getStyle (dom, attr) {
   } else {
     return getComputedStyle(dom, false)[attr]
   }
+}
+
+export function toDouble(num) {
+    if (num < 10) {
+        return '0' + num;
+    } else {
+        return num
+    }
 }

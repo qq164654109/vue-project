@@ -149,6 +149,47 @@ export const asyncRoutes = [
         path: '/tools/dragListDemo',
         name: 'toolsDragListDemo',
         component: () => import('@/views/tools/dragListDemo')
+      },
+      {
+        path: '/tools/calendarDemo',
+        name: 'toolsCalendarDemo',
+        component: () => import('@/views/tools/calendarDemo')
+      }
+    ]
+  },
+  {
+    path: '/hightopo',
+    name: 'hightopo',
+    meta: {
+      icon: 'guanlianshebei'
+    },
+    redirect: '/hightopo/node',
+    component: Layout,
+    children: [
+      {
+        path: '/hightopo/drawing',
+        name: 'hightopoDrawing',
+        component: () => import('@/views/hightopo/drawing')
+      },
+      {
+        path: '/hightopo/node',
+        name: 'hightopoNode',
+        component: () => import('@/views/hightopo/node')
+      }
+    ]
+  },
+  {
+    path: '/leaflet',
+    redirect: '/leaflet/index',
+    component: Layout,
+    children: [
+      {
+        path: '/leaflet/index',
+        name: 'leaflet',
+        meta: {
+          icon: 'guanlianshebei'
+        },
+        component: () => import('@/views/leaflet/index')
       }
     ]
   },

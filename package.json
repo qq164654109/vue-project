@@ -20,6 +20,7 @@
     "fontawesome": "^4.7.2",
     "highlight.js": "^9.13.1",
     "js-cookie": "^2.2.0",
+    "leaflet": "^1.4.0",
     "marked": "^0.5.1",
     "normalize.css": "^8.0.0",
     "nprogress": "^0.2.0",

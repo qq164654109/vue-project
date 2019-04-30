@@ -19,7 +19,12 @@ export default {
     toolsStickyDemo: 'Sticky Demo',
     toolsLazyLoadSelectDemo: 'LazyLoadSelect Demo',
     toolsDragDialogDemo: 'DragDialog Demo',
-    toolsDragListDemo: 'DragList Demo'
+    toolsDragListDemo: 'DragList Demo',
+    toolsCalendarDemo: 'ToolsCalendar Demo',
+    hightopo: 'Hightopo',
+    hightopoDrawing: 'Hightopo Drawing',
+    hightopoNode: 'Hightopo Node',
+    leaflet: 'Leaflet'
   },
   navbar: {
     dashboard: 'dashboard',

@@ -10,17 +10,14 @@ export default {
     },
     name: {
       type: String,
-      custom: true,
-      default: undefined
+      default: null
     },
     layerType: {
       type: String,
-      custom: true,
-      default: undefined
+      default: null
     },
     visible: {
       type: Boolean,
-      custom: true,
       default: true
     }
   }

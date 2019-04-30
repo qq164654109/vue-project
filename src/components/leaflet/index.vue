@@ -7,6 +7,7 @@
 <script>
     import { map, CRS } from 'leaflet';
     import 'leaflet/dist/leaflet.css';
+    import { optionsMerger } from "./utils";
 
     export default {
       provide() {
@@ -56,17 +57,12 @@
         }
       },
       mounted() {
-        this.LMap = map(this.$el, {
-            crs: this.crs,
-            center: this.center,
-            zoom: this.zoom,
-            minZoom: this.minZoom,
-            zoomSnap: this.zoomSnap
-        });
+        const options = optionsMerger(this);
+        this.LMap = map(this.$el, options);
         this.$emit('map-load')
       },
       beforeDestroy() {
-        this.LMap.destroy();
+        // this.LMap.destroy();
       }
     }
 </script>

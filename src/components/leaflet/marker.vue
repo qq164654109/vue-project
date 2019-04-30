@@ -1,5 +1,6 @@
 <script>
   import { marker } from 'leaflet'
+  import { optionsMerger } from "./utils";
 
   export default {
       inject: ['getMap'],
@@ -34,12 +35,8 @@
         }
       },
       mounted() {
-        this.LMarker = marker(this.latLng, {
-          icon: this.icon,
-          draggable: this.draggable,
-          zIndexOffset: this.zIndexOffset,
-          pane: this.pane
-        });
+        const options = optionsMerger(this);
+        this.LMarker = marker(this.latLng, options);
         this.LMap = this.getMap();
         this.LMap.addLayer(this.LMarker);
         this.ready = true;

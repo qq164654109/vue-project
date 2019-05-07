@@ -8,17 +8,15 @@ export default {
       type: String,
       default: null
     },
-    name: {
-      type: String,
-      default: null
-    },
-    layerType: {
-      type: String,
-      default: null
-    },
     visible: {
       type: Boolean,
       default: true
+    }
+  },
+  mounted() {
+    this.layerOptions = {
+      pane: this.pane,
+      attribution: this.attribution
     }
   }
 }

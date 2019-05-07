@@ -1,9 +1,10 @@
 <script>
-  import { marker } from 'leaflet'
-  import { optionsMerger } from "./utils";
+  import { marker, DomEvent } from 'leaflet';
+  import layerMixin from '../mixins/layer';
+  import { optionsMerger } from "../utils/index";
 
   export default {
-      inject: ['getMap'],
+      mixins: [layerMixin],
       props: {
         pane: {
           type: String,
@@ -18,11 +19,6 @@
           custom: true,
           default: null
         },
-        icon: {
-          type: [Object],
-          custom: false,
-          default: () => new Icon.Default()
-        },
         zIndexOffset: {
           type: Number,
           custom: false,
@@ -35,11 +31,24 @@
         }
       },
       mounted() {
-        const options = optionsMerger(this);
-        this.LMarker = marker(this.latLng, options);
-        this.LMap = this.getMap();
-        this.LMap.addLayer(this.LMarker);
-        this.ready = true;
+        const options = optionsMerger(this, {
+          ...this.layerOptions,
+          draggable: this.draggable,
+          zIndexOffset: this.zIndexOffset
+        });
+
+        this.layer = marker(this.latLng, options);
+        DomEvent.on(this.layer, this.$listeners);
+        this.parentLayer = this.$parent.layer;
+        this.parentLayer.addLayer(this.layer);
+
+        this.$nextTick(() => {
+          this.ready = true;
+          this.$emit('loaded', this.layer)
+        })
+      },
+      beforeDestroy() {
+        this.parentLayer && this.parentLayer.removeLayer(this.layer);
       },
       render(h) {
         if (this.ready && this.$slots.default) {

@@ -1,12 +1,20 @@
 <script>
   import 'leaflet.markercluster/dist/MarkerCluster.css';
   import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
-  import { MarkerClusterGroup } from 'leaflet.markercluster';
-  import { divIcon } from 'leaflet'
-  import optionsMixin from '../mixins/options';
+  import { MarkerClusterGroup, DomEvent } from 'leaflet.markercluster';
+  import { propsWatchBind } from '../utils';
 
   export default {
-    mixins: ['optionsMixin'],
+    props: {
+      options: {
+        type: Object,
+        default: () => {}
+      },
+      visible: {
+        type: Boolean,
+        default: true
+      }
+    },
     data() {
       return {
         ready: false
@@ -21,12 +29,31 @@
       },
       clearLayers() {
         this.layer && this.layer.clearLayers()
+      },
+      setVisible(newVal, oldVal) {
+        if (newVal === oldVal) return;
+        if (newVal) {
+          if (!this.parentLayer.hasLayer(this.layer)) {
+            this.parentLayer.addLayer(this.layer);
+          }
+        } else {
+          this.parentLayer.removeLayer(this.layer);
+        }
+      },
+      bindEvent() {
+        const listeners = this.$listeners;
+        Object.keys(listeners).forEach(evtName => {
+          const fnc = listeners[evtName];
+          this.layer.on(evtName, fnc);
+        })
       }
     },
     mounted() {
       this.layer = new MarkerClusterGroup(this.options);
+      propsWatchBind(this, this.layer, this.$options.props);
+      this.bindEvent();
       this.parentLayer = this.$parent.layer;
-      this.parentLayer.addLayer(this.layer);
+      this.visible && this.parentLayer.addLayer(this.layer);
 
       this.$nextTick(() => {
         this.ready = true;

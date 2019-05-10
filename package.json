@@ -28,7 +28,7 @@
     "marked": "^0.5.1",
     "normalize.css": "^8.0.0",
     "nprogress": "^0.2.0",
-    "rbush": "^2.0.2",
+    "rbush": "^1.4.2",
     "showdown": "^1.8.7",
     "simplemde": "^1.11.2",
     "tinymce": "^4.8.4",

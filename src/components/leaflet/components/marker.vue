@@ -1,7 +1,7 @@
 <script>
   import { marker, DomEvent } from 'leaflet';
   import layerMixin from '../mixins/layer';
-  import { optionsMerger } from "../utils/index";
+  import { optionsMerger, propsWatchBind } from "../utils/index";
 
   export default {
       mixins: [layerMixin],
@@ -30,6 +30,11 @@
           ready: false
         }
       },
+      methods: {
+        setLatLng(newVal, oldVal) {
+          this.layer.setLatLng(newVal);
+        }
+      },
       mounted() {
         const options = optionsMerger(this, {
           ...this.layerOptions,
@@ -39,8 +44,9 @@
 
         this.layer = marker(this.latLng, options);
         DomEvent.on(this.layer, this.$listeners);
+        propsWatchBind(this, this.layer, this.$options.props);
         this.parentLayer = this.$parent.layer;
-        this.parentLayer.addLayer(this.layer);
+        this.visible && this.parentLayer.addLayer(this.layer);
 
         this.$nextTick(() => {
           this.ready = true;

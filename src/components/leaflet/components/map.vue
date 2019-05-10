@@ -7,17 +7,19 @@
 <script>
   import 'leaflet/dist/leaflet.css';
   import { map, DomEvent, CRS } from 'leaflet';
-  import optionsMixin from '../mixins/options';
-  import { optionsMerger } from "../utils/index";
+  import { optionsMerger, propsWatchBind } from "../utils/index";
 
   export default {
-    mixins: [optionsMixin],
     provide() {
       return {
         getMap: this.getMap
       }
     },
     props: {
+      options: {
+        type: Object,
+        default: () => {}
+      },
       id: {
         type: String,
         required: true
@@ -44,7 +46,6 @@
       },
       crs: {
         type: Object,
-        custom: true,
         default: () => CRS.EPSG3857
       },
     },
@@ -54,33 +55,40 @@
       }
     },
     methods: {
-      setCenter(center) {
-        const oldCenter = this.layer.getCenter();
+      setCenter(newVal, oldVal) {
+        const oldCenter = oldVal || this.layer.getCenter();
 
-        if (oldCenter !== center) {
+        if (oldCenter[0] !== newVal[0] || oldCenter[1] !== newVal[1]) {
           this.layer.panTo(center, {
             animate: false
           });
-          this.$emit('update:center', center);
         }
       },
-      setZoom(zoom) {
-        const oldZoom = this.layer.getZoom();
+      setZoom(newVal, oldVal) {
+        const oldZoom = oldVal || this.layer.getZoom();
 
-        if (oldZoom !== zoom) {
-          this.layer.setZoom(zoom);
-          this.$emit('update:zoom', zoom);
+        if (oldZoom !== newVal) {
+          this.layer.setZoom(newVal);
         }
       },
       setView(center, zoom) {
         const oldCenter = this.layer.getCenter();
         const oldZoom = this.layer.getZoom();
 
-        if (oldCenter !== center || oldZoom !== zoom) {
-          this.layer.setView(center, zoom);
+        if (oldCenter[0] !== center[0] || oldCenter[1] !== center[1] || oldZoom !== zoom) {
+          this.layer.setView(center, zoom, {
+            animate: false
+          });
           this.$emit('update:center', center);
           this.$emit('update:zoom', zoom);
         }
+      },
+      moveEndHandler() {
+        const center = this.layer.getCenter();
+        const zoom = this.layer.getZoom();
+
+        this.$emit('update:center', center);
+        this.$emit('update:zoom', zoom);
       },
       getMap() {
         return this.layer
@@ -97,7 +105,9 @@
       });
 
       this.layer = map(this.id, options);
+      this.layer.on('moveend', this.moveEndHandler);
       DomEvent.on(this.layer, this.$listeners);
+      propsWatchBind(this, this.layer, this.$options.props);
 
       this.$nextTick(() => {
         this.ready = true;

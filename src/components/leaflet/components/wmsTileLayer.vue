@@ -3,7 +3,7 @@
   import layerMixin from '../mixins/layer';
   import optionsMixin from '../mixins/options';
   import gridLayerMixin from '../mixins/gridLayer';
-  import { TILE_URL, optionsMerger } from "../utils/index";
+  import { TILE_URL, optionsMerger, propsWatchBind } from "../utils/index";
 
   export default {
     mixins: [layerMixin, gridLayerMixin, optionsMixin],
@@ -36,8 +36,9 @@
 
       this.layer = tileLayer.wms(this.url, options);
       DomEvent.on(this.layer, this.$listeners);
+      propsWatchBind(this, this.layer, this.$options.props);
       this.LMap = this.getMap();
-      this.LMap.addLayer(this.layer);
+      this.visible && this.LMap.addLayer(this.layer);
 
       this.$nextTick(() => {
         this.$emit('loaded', this.layer)

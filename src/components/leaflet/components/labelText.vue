@@ -1,9 +1,15 @@
 <script>
-  import Vue from 'vue';
   import { tooltip, DomEvent } from 'leaflet';
   import layerMixin from '../mixins/layer';
   import divOverlayMixin from '../mixins/divOverlay';
-  import { optionsMerger, propsWatchBind } from "../utils/index";
+  import { optionsMerger, propsWatchBind, objToStyleStr} from "../utils/index";
+
+  const defaultFontStyle = {
+    color: '#1a1a1a',
+    fontSize: 14,
+    textShadow: '#fff 0 0 0, #fff 0 1px 0, #fff 0 0 0, #fff 0 -1px 0',
+    fontWeight: 'normal'
+  };
 
   export default {
     mixins: [layerMixin, divOverlayMixin],
@@ -17,14 +23,6 @@
         type: String,
         default: '提示'
       },
-      permanent: {
-        type: Boolean,
-        default: null
-      },
-      sticky: {
-        type: Boolean,
-        default: false
-      },
       direction: {
         type: String,
         default: 'top'
@@ -33,38 +31,20 @@
         type: Number,
         default: 1
       },
+      fontStyle: {
+        type: Object,
+        default: () => defaultFontStyle
+      },
+      hoverStyle: {
+        type: Object,
+        default: () => {}
+      },
       limitZoom: {
         type: Number,
         default: null
-      },
-      pointEvents: {
-        type: Boolean,
-        default: false
       }
     },
     methods: {
-      setContent() {
-        const slots = this.$slots.default || [];
-        if (slots.length) {
-          const TooltipComp = Vue.extend({
-            data() {
-              return {
-                vnode: Object.freeze(slots)
-              }
-            },
-            render(h) {
-              const { vnode } = this;
-              return h('div', {
-                className: 'popup-component'
-              }, Array.isArray(vnode) ? vnode : [vnode])
-            }
-          });
-          this.tooltipComp = new TooltipComp().$mount();
-          this.layer.setContent(this.tooltipComp.$el);
-        } else {
-          this.layer.setContent(this.content);
-        }
-      },
       setOpacity(newVal, oldVal) {
         const oldOpacity = oldVal || this.layer.options.opacity;
         if (oldOpacity !== newVal) {
@@ -94,31 +74,45 @@
         };
         this._zoomEndHandler();
         this.LMap.on('zoomend', this._zoomEndHandler);
+      },
+      setParentHoverListener() {
+        this._mouseOverHandler = () => {
+          const $textWrapper = this.layer.getElement().querySelector('.text-wrapper');
+          $textWrapper.style = this.hoverFontStyleStr;
+        };
+        this._mouseOutHandler = () => {
+          const $textWrapper = this.layer.getElement().querySelector('.text-wrapper');
+          $textWrapper.style = this.resetfontStyleStr;
+        };
+        this.parentLayer.on('mouseover', this._mouseOverHandler);
+        this.parentLayer.on('mouseout', this._mouseOutHandler);
       }
     },
     mounted() {
       const options = optionsMerger(this, {
         ...this.layerOptions,
         ...this.divOverlayOptions,
-        permanent: this.permanent,
+        permanent: true,
         sticky: this.sticky,
         direction: this.direction,
-        opacity: this.opacity
+        opacity: this.opacity,
+        className: this.className + ' leaflet-labelText'
       });
+      this.resetfontStyleStr = objToStyleStr({...defaultFontStyle, ...this.fontStyle});
+      this.hoverFontStyleStr = objToStyleStr({...defaultFontStyle, ...this.hoverStyle});
 
       this.layer = tooltip(options);
       DomEvent.on(this.layer, this.$listeners);
       propsWatchBind(this, this.layer, this.$options.props);
-      this.setContent();
+      this.layer.setContent(`<div class="text-wrapper" style="${this.resetfontStyleStr}">${this.content}</div>`);
       this.parentLayer = this.$parent.layer;
-      if (this.permanent && !!this.limitZoom) {
+      if (!!this.limitZoom) {
         this.setZoomVisibleListener();
       } else {
         this.visible && this.parentLayer.bindTooltip(this.layer);
       }
-      if (this.pointEvents) {
-        const tooltipEle = this.layer.getElement();
-        tooltipEle.style.pointerEvents = 'auto'
+      if (Object.keys(this.hoverStyle).length > 0) {
+        this.setParentHoverListener()
       }
 
       this.$nextTick(() => {
@@ -126,17 +120,26 @@
       })
     },
     beforeDestroy() {
-      !!this.tooltipComp && this.tooltipComp.$destroy();
       !!this.parentLayer && this.parentLayer.unbindTooltip();
       !!this._zoomEndHandler && this.LMap.off('zoomend', this._zoomEndHandler);
+      !!this._mouseOverHandler && this.parentLayer.off('mouseover', this._mouseOverHandler);
+      !!this._mouseOutHandler && this.parentLayer.off('mouseover', this._mouseOutHandler);
     },
     render(h) {
-      const slots = this.$slots.default || [];
-
-      if (slots.length) {
-        this.tooltipComp && (this.tooltipComp.vnode = Object.freeze(slots));
-      }
       return null
     }
   }
 </script>
+
+<style lang="scss">
+    .leaflet-labelText {
+        background-color: transparent;
+        white-space: nowrap;
+        pointer-events: auto;
+        border: 1px solid transparent;
+        box-shadow: none;
+        &:before {
+            display: none;
+        }
+    }
+</style>

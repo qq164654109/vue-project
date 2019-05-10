@@ -1,6 +1,6 @@
 <script>
   import Vue from 'vue';
-  import { popup, DomEvent } from 'leaflet';
+  import { popup, DomEvent, Map } from 'leaflet';
   import layerMixin from '../mixins/layer';
   import divOverlayMixin from '../mixins/divOverlay';
   import { optionsMerger, propsWatchBind } from "../utils/index";
@@ -17,6 +17,10 @@
         type: String,
         default: '弹窗'
       },
+      latLng: {
+        type: Array,
+        require: true
+      },
       maxWidth: {
         type: Number,
         default: 300
@@ -28,18 +32,6 @@
       maxHeight: {
         type: Number,
         default: null
-      },
-      closeButton: {
-        type: Boolean,
-        default: true
-      },
-      autoClose: {
-        type: Boolean,
-        default: true
-      },
-      closeOnClick: {
-        type: Boolean,
-        default: true
       }
     },
     methods: {
@@ -69,9 +61,16 @@
       setVisible(newVal, oldVal) {
         if (newVal === oldVal) return;
         if (newVal) {
-          this.parentLayer.bindPopup(this.layer);
+          this.parentLayer.openPopup(this.layer);
         } else {
-          this.parentLayer.unbindPopup(this.layer);
+          this.parentLayer.closePopup(this.layer);
+        }
+      },
+      setLatLng(newVal, oldVal) {
+        const oldLatLng = oldVal || this.layer.getLatLng();
+
+        if (oldLatLng !== newVal) {
+          this.layer.setLatLng(newVal)
         }
       }
     },
@@ -82,9 +81,9 @@
         maxWidth: this.maxWidth,
         minWidth: this.minWidth,
         maxHeight: this.maxHeight,
-        closeButton: this.closeButton,
-        autoClose: this.autoClose,
-        closeOnClick: this.closeOnClick
+        closeButton: false,
+        autoClose: false,
+        closeOnClick: false
       });
 
       this.layer = popup(options);
@@ -92,7 +91,8 @@
       propsWatchBind(this, this.layer, this.$options.props);
       this.setContent();
       this.parentLayer = this.$parent.layer;
-      this.visible && this.parentLayer.bindPopup(this.layer);
+      this.layer.setLatLng(this.latLng);
+      this.latLng && this.visible && this.parentLayer.openPopup(this.layer);
 
       this.$nextTick(() => {
         this.$emit('loaded', this.layer)
@@ -100,10 +100,11 @@
     },
     beforeDestroy() {
       !!this.popupComp && this.popupComp.$destroy();
-      !!this.parentLayer && this.parentLayer.unbindPopup();
+      !!this.parentLayer && this.parentLayer.closePopup(this.layer);
     },
     render(h) {
       const slots = this.$slots.default || [];
+
       if (slots.length) {
         !!this.popupComp && (this.popupComp.vnode = Object.freeze(slots));
       }

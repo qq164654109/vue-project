@@ -1,7 +1,7 @@
 <script>
   import { icon } from 'leaflet';
   import iconMixin from '../mixins/icon';
-  import { ICON_DEFAULT, optionsMerger } from "../utils/index";
+  import { ICON_DEFAULT, optionsMerger, propsWatchBind } from "../utils/index";
 
   export default {
     mixins: [iconMixin],
@@ -16,6 +16,7 @@
         ...this.iconOptions
       });
       const LIcon = icon(options);
+      propsWatchBind(this, LIcon, this.$options.props);
       const parentLayer = this.$parent.layer;
       parentLayer.setIcon(LIcon)
     },

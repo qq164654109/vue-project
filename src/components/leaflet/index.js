@@ -1,7 +1,6 @@
 export { default as LMap } from './components/map';
 export { default as LTileLayer } from './components/tileLayer';
 export { default as LWmsTileLayer } from './components/wmsTileLayer';
-export { default as LChinaTileLayer } from './components/chinaTileLayer';
 export { default as LMarker } from './components/marker';
 export { default as LRotatedMarker } from './components/rotatedMarker';
 export { default as LMarkerCollision } from './components/markerCollision';

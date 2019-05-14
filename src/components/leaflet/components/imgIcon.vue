@@ -15,6 +15,7 @@
       const options = optionsMerger(this, {
         ...this.iconOptions
       });
+
       const LIcon = icon(options);
       propsWatchBind(this, LIcon, this.$options.props);
       const parentLayer = this.$parent.layer;

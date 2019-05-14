@@ -48,6 +48,10 @@
         type: Object,
         default: () => CRS.EPSG3857
       },
+      panes: {
+        type: Array,
+        default: () => []
+      }
     },
     data() {
       return {
@@ -83,6 +87,11 @@
           this.$emit('update:zoom', zoom);
         }
       },
+      createPanes(paneNames) {
+        paneNames.forEach(name => {
+          this.layer.createPane(name)
+        })
+      },
       moveEndHandler() {
         const center = this.layer.getCenter();
         const zoom = this.layer.getZoom();
@@ -106,6 +115,7 @@
 
       this.layer = map(this.id, options);
       this.layer.on('moveend', this.moveEndHandler);
+      this.createPanes(this.panes);
       DomEvent.on(this.layer, this.$listeners);
       propsWatchBind(this, this.layer, this.$options.props);
 
@@ -115,6 +125,8 @@
       })
     },
     beforeDestroy() {
+      console.log(111)
+      console.log(this.layer.destroy)
       // this.layer.destroy();
     }
   }

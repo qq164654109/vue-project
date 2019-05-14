@@ -7,8 +7,8 @@
             <!--<L-single-popup :lat-lng="[31.323, 118.184]" :visible="layerVisible">-->
                 <!--<popup></popup>-->
             <!--</L-single-popup>-->
-            <!--<L-marker-cluster :options="clusterOptions" @click="test">-->
-                <!--<L-marker v-for="(item, index) in markers" :key="index" :lat-lng="item.latLng">-->
+            <!--<L-marker-cluster :options="clusterOptions" :visible="layerVisible">-->
+                <!--<L-marker v-for="(item, index) in markers" :key="index" :lat-lng="item.latLng" >-->
                     <!--<L-icon></L-icon>-->
                 <!--</L-marker>-->
             <!--</L-marker-cluster>-->
@@ -16,7 +16,7 @@
                 <!--<L-icon></L-icon>-->
                 <!--<L-tooltip :permanent="true" :offset="[0, -15]" :content="layerContent"></L-tooltip>-->
             <!--</L-marker>-->
-            <!--<L-marker-collision :margin="5">-->
+            <!--<L-marker-collision :margin="5" :visible="layerVisible">-->
                 <!--<L-marker v-for="(item, index) in markers" :key="index" :lat-lng="item.latLng">-->
                     <!--<L-icon></L-icon>-->
                     <!--<L-tooltip :offset="[0, -15]" :content="layerContent"></L-tooltip>-->
@@ -26,10 +26,10 @@
                 <L-popup :content="layerContent"><div @click="onLayerClick">adadad</div></L-popup>
                 <L-marker v-for="(item, index) in markers" :key="index" :lat-lng="item.latLng">
                     <L-icon></L-icon>
-                    <L-label-text :limitZoom="12" :font-style="fontStyle" :hover-style="{color: 'red'}" content="1231231"></L-label-text>
+                    <!--<L-div-icon :font-style="{color: '#409eff', fontSize: '20px'}" :icon-size="[53, 30]"><i class='el-icon-location'></i>tips</L-div-icon>-->
                 </L-marker>
             </L-feature-group>
-            <L-ant-polyline v-if="latLngs" :lat-lngs="latLngs" :paused="antPaused" :pulse-color="pulseColor" @mousemove="onMouseMove" @mouseout="onMouseLeave"></L-ant-polyline>
+            <!--<L-ant-polyline v-if="latLngs" :lat-lngs="latLngs" :paused="antPaused" :pulse-color="pulseColor" @mousemove="onMouseMove" @mouseout="onMouseLeave"></L-ant-polyline>-->
             <!--<L-marker v-for="(item, index) in markers" :key="index" :lat-lng="item.latLng">-->
                 <!--<L-icon></L-icon>-->
             <!--</L-marker>-->
@@ -37,18 +37,20 @@
                 <!--<L-icon></L-icon>-->
             <!--</L-rotated-marker>-->
             <!--<L-label-geoJSON  v-if="geoLayers" :geo-data="geoLayers" :visible="false" :geo-style="geoStyle" :label-opt="labelOptions" :font-style="labelFontStyle"></L-label-geoJSON>-->
-            <L-geoJSON v-if="geoLayers" :geo-data="geoLayers" :geo-style="geoStyle" @click="onLayerClick">
-                <!--<L-tooltip :offset="[0, -15]" :content="layerContent"></L-tooltip>-->
-            </L-geoJSON>
-            <L-wms-tileLayer :url="wmsUrl" :options="{layers: '0,1,2,3,4,5,6,7,8,9,10'}"></L-wms-tileLayer>
+            <!--<L-geoJSON v-if="geoLayers" :geo-data="geoLayers" :geo-style="geoStyle" @click="onLayerClick">-->
+                <!--&lt;!&ndash;<L-tooltip :offset="[0, -15]" :content="layerContent"></L-tooltip>&ndash;&gt;-->
+            <!--</L-geoJSON>-->
+            <L-tileLayer :url="tileUrl1" :options="{subdomains: ['0', '1', '2', '3', '4', '5', '6', '7']}" :max-zoom="20" :min-zoom="2" :opacity=".8"></L-tileLayer>
+            <L-tileLayer :url="tileUrl2" :options="{subdomains: ['0', '1', '2', '3', '4', '5', '6', '7']}" :max-zoom="20" :min-zoom="2" :opacity=".8"></L-tileLayer>
         </L-map>
     </div>
 </template>
 
 <script>
+  import { divIcon } from 'leaflet';
   import axios from 'axios';
   import { LMap, LMarker, LRotatedMarker, LMarkerCollision, LMarkerCluster, LGeoJSON, LLabelGeoJSON, LIcon, LTooltip, LLabelText,
-    LPopup, LSinglePopup, LDivIcon, LWmsTileLayer, LPolyline, LAntPolyline, LLayerGroup, LFeatureGroup } from '@/components/leaflet';
+    LPopup, LSinglePopup, LDivIcon, LTileLayer, LWmsTileLayer, LPolyline, LAntPolyline, LLayerGroup, LFeatureGroup } from '@/components/leaflet';
   import popup from './parts/popup'
 
   export default {
@@ -59,7 +61,8 @@
         minZoom: 5,
         maxZoom: 20,
         center: [31.323, 118.184],
-        wmsUrl: 'http://iwater.ecidi.com/wuhu-arcgis/services/wisdomwater/芜湖浅色地图配色/MapServer/WMSServer?',
+        tileUrl1: 'http://t0.tianditu.gov.cn/vec_w/wmts?service=wmts&request=GetTile&version=1.0.0&LAYER=vec&tileMatrixSet=w&TileMatrix={z}&TileRow={y}&TileCol={x}&style=default&format=tiles&tk=5d1f892a1e0dcf94010069d4801a21b5',
+        tileUrl2: 'http://t0.tianditu.gov.cn/cva_w/wmts?service=wmts&request=GetTile&version=1.0.0&LAYER=cva&tileMatrixSet=w&TileMatrix={z}&TileRow={y}&TileCol={x}&style=default&format=tiles&tk=5d1f892a1e0dcf94010069d4801a21b5',
         markers: [],
         geoLayers: null,
         geoStyle: {
@@ -69,6 +72,13 @@
           showCoverageOnHover: false,
           zoomToBoundsOnClick: true,
           removeOutsideVisibleBounds: true
+        },
+        iconCreateFunction: cluster => {
+          if (cluster.getChildCount() > 5) {
+            return divIcon({ html: `<div class="cluster-red">${cluster.getChildCount()}</div>` , iconSize: [25, 25]});
+          } else {
+            return divIcon({ html: `<div class="cluster">${cluster.getChildCount()}</div>` , iconSize: [25, 25]});
+          }
         },
         labelOptions: {
           offset: [0, 10],
@@ -89,7 +99,7 @@
         },
         latLngs: null,
         antPaused: false,
-        pulseColor: 'red'
+        pulseColor: '#FFFFFF'
       }
     },
     methods: {
@@ -103,13 +113,13 @@
         console.log(e);
       },
       onMouseMove(e) {
-        this.pulseColor = '#fff'
+        this.pulseColor = '#8FFFA4'
       },
       onMouseLeave(e) {
-        this.pulseColor = 'red'
+        this.pulseColor = '#FFFFFF'
       },
       test(a) {
-        this.fontStyle.color = 'red'
+        alert(1)
       },
       alertA() {
         alert('1111')
@@ -165,11 +175,13 @@
         // this.zoom = 14
         this.layerOffset = [0, 20];
         this.layerOpacity = 0.2;
+        this.layerVisible = true;
       }, 1000);
       this.getGeoJsonData();
     },
     components: {
       LMap,
+      LTileLayer,
       LWmsTileLayer,
       LMarker,
       LRotatedMarker,
@@ -202,6 +214,28 @@
             top: 20px;
             right: 20px;
             z-index: 1000;
+        }
+        /deep/ {
+            .cluster {
+                width: 25px;
+                height: 25px;
+                font-size: 16px;
+                line-height: 25px;
+                text-align: center;
+                background-color: #409eff;
+                color: #fff;
+                border-radius: 50%;
+            }
+            .cluster-red {
+                width: 25px;
+                height: 25px;
+                font-size: 16px;
+                line-height: 25px;
+                text-align: center;
+                background-color: red;
+                color: #fff;
+                border-radius: 50%;
+            }
         }
     }
 </style>

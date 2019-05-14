@@ -32,18 +32,12 @@
         } else {
           this.parentLayer.removeLayer(this.layer);
         }
-      },
-      bindEvent() {
-        const listeners = this.$listeners;
-        Object.keys(listeners).forEach(evtName => {
-          const fnc = listeners[evtName];
-          this.layer.on(evtName, fnc);
-        })
       }
     },
     mounted() {
       this.layer = layerGroup.collision({ margin : this.margin });
-      this.bindEvent();
+
+      DomEvent.on(this.layer, this.$listeners);
       propsWatchBind(this, this.layer, this.$options.props);
       this.parentLayer = this.$parent.layer;
       this.visible && this.parentLayer.addLayer(this.layer);

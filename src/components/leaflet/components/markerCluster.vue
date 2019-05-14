@@ -1,14 +1,19 @@
 <script>
   import 'leaflet.markercluster/dist/MarkerCluster.css';
   import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
-  import { MarkerClusterGroup, DomEvent } from 'leaflet.markercluster';
-  import { propsWatchBind } from '../utils';
+  import 'leaflet.markercluster';
+  import { markerClusterGroup, DomEvent } from 'leaflet';
+  import { optionsMerger, propsWatchBind } from '../utils';
 
   export default {
     props: {
       options: {
         type: Object,
         default: () => {}
+      },
+      iconCreate: {
+        type: Function,
+        default: null
       },
       visible: {
         type: Boolean,
@@ -39,19 +44,16 @@
         } else {
           this.parentLayer.removeLayer(this.layer);
         }
-      },
-      bindEvent() {
-        const listeners = this.$listeners;
-        Object.keys(listeners).forEach(evtName => {
-          const fnc = listeners[evtName];
-          this.layer.on(evtName, fnc);
-        })
       }
     },
     mounted() {
-      this.layer = new MarkerClusterGroup(this.options);
-      propsWatchBind(this, this.layer, this.$options.props);
-      this.bindEvent();
+      const options = optionsMerger(this, {
+        iconCreateFunction: this.iconCreate
+      });
+
+      this.layer = markerClusterGroup(options);
+      propsWatchBind(this, this.layer);
+      DomEvent.on(this.layer, this.$listeners);
       this.parentLayer = this.$parent.layer;
       this.visible && this.parentLayer.addLayer(this.layer);
 
@@ -76,3 +78,10 @@
     }
   }
 </script>
+
+<style lang="scss">
+    .leaflet-div-icon {
+        background: transparent;
+        border: 1px solid transparent;
+    }
+</style>

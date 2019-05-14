@@ -6,7 +6,6 @@
 
     export default {
       mixins: [layerMixin, gridLayerMixin],
-      inject: ['getMap'],
       props: {
         url: {
           type: String,
@@ -20,10 +19,10 @@
           type: Number,
           default: 10,
         },
-        // tileLayerClass: {
-        //   type: Function,
-        //   default: tileLayer
-        // }
+        tileLayerClass: {
+          type: Function,
+          default: tileLayer
+        }
       },
       mounted() {
         const options = optionsMerger(this, {
@@ -32,15 +31,18 @@
           minZoom: this.minZoom,
           maxZoom: this.maxZoom
         });
-        this.layer = tileLayer(this.url, options);
+        this.layer = this.tileLayerClass(this.url, options);
         DomEvent.on(this.layer, this.$listeners);
         propsWatchBind(this, this.layer, this.$options.props);
-        this.LMap = this.getMap();
-        this.visible && this.LMap.addLayer(this.layer);
+        this.parentLayer = this.$parent.layer;
+        this.visible && this.parentLayer.addLayer(this.layer);
 
         this.$nextTick(() => {
           this.$emit('loaded', this.layer)
         })
+      },
+      beforeDestroy() {
+        this.parentLayer && this.parentLayer.removeLayer(this.layer);
       },
       render(h) {
         return null

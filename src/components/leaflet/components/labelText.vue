@@ -33,7 +33,7 @@
       },
       fontStyle: {
         type: Object,
-        default: () => defaultFontStyle
+        default: () => {}
       },
       hoverStyle: {
         type: Object,
@@ -43,6 +43,43 @@
         type: Number,
         default: null
       }
+    },
+    mounted() {
+      const options = optionsMerger(this, {
+        ...this.layerOptions,
+        ...this.divOverlayOptions,
+        permanent: true,
+        sticky: this.sticky,
+        direction: this.direction,
+        opacity: this.opacity,
+        className: this.className + ' leaflet-labelText'
+      });
+      this.resetfontStyleStr = objToStyleStr({...defaultFontStyle, ...this.fontStyle});
+      this.hoverFontStyleStr = objToStyleStr({...defaultFontStyle, ...this.hoverStyle});
+
+      this.layer = tooltip(options);
+      DomEvent.on(this.layer, this.$listeners);
+      propsWatchBind(this, this.layer, this.$options.props);
+      this.layer.setContent(`<div class="font-wrapper" style="${this.resetfontStyleStr}">${this.content}</div>`);
+      this.parentLayer = this.$parent.layer;
+      if (!!this.limitZoom) {
+        this.setZoomVisibleListener();
+      } else {
+        this.visible && this.parentLayer.bindTooltip(this.layer);
+      }
+      if (Object.keys(this.hoverStyle).length > 0) {
+        this.setParentHoverListener()
+      }
+
+      this.$nextTick(() => {
+        this.$emit('loaded', this.layer)
+      })
+    },
+    beforeDestroy() {
+      !!this.parentLayer && this.parentLayer.unbindTooltip();
+      !!this._zoomEndHandler && this.LMap.off('zoomend', this._zoomEndHandler);
+      !!this._mouseOverHandler && this.parentLayer.off('mouseover', this._mouseOverHandler);
+      !!this._mouseOutHandler && this.parentLayer.off('mouseover', this._mouseOutHandler);
     },
     methods: {
       setOpacity(newVal, oldVal) {
@@ -78,54 +115,17 @@
       setParentHoverListener() {
         this._mouseOverHandler = () => {
           if (!this.layer.getElement()) return;
-          const $textWrapper = this.layer.getElement().querySelector('.text-wrapper');
+          const $textWrapper = this.layer.getElement().querySelector('.font-wrapper');
           $textWrapper.style = this.hoverFontStyleStr;
         };
         this._mouseOutHandler = () => {
           if (!this.layer.getElement()) return;
-          const $textWrapper = this.layer.getElement().querySelector('.text-wrapper');
+          const $textWrapper = this.layer.getElement().querySelector('.font-wrapper');
           $textWrapper.style = this.resetfontStyleStr;
         };
         this.parentLayer.on('mouseover', this._mouseOverHandler);
         this.parentLayer.on('mouseout', this._mouseOutHandler);
       }
-    },
-    mounted() {
-      const options = optionsMerger(this, {
-        ...this.layerOptions,
-        ...this.divOverlayOptions,
-        permanent: true,
-        sticky: this.sticky,
-        direction: this.direction,
-        opacity: this.opacity,
-        className: this.className + ' leaflet-labelText'
-      });
-      this.resetfontStyleStr = objToStyleStr({...defaultFontStyle, ...this.fontStyle});
-      this.hoverFontStyleStr = objToStyleStr({...defaultFontStyle, ...this.hoverStyle});
-
-      this.layer = tooltip(options);
-      DomEvent.on(this.layer, this.$listeners);
-      propsWatchBind(this, this.layer, this.$options.props);
-      this.layer.setContent(`<div class="text-wrapper" style="${this.resetfontStyleStr}">${this.content}</div>`);
-      this.parentLayer = this.$parent.layer;
-      if (!!this.limitZoom) {
-        this.setZoomVisibleListener();
-      } else {
-        this.visible && this.parentLayer.bindTooltip(this.layer);
-      }
-      if (Object.keys(this.hoverStyle).length > 0) {
-        this.setParentHoverListener()
-      }
-
-      this.$nextTick(() => {
-        this.$emit('loaded', this.layer)
-      })
-    },
-    beforeDestroy() {
-      !!this.parentLayer && this.parentLayer.unbindTooltip();
-      !!this._zoomEndHandler && this.LMap.off('zoomend', this._zoomEndHandler);
-      !!this._mouseOverHandler && this.parentLayer.off('mouseover', this._mouseOverHandler);
-      !!this._mouseOutHandler && this.parentLayer.off('mouseover', this._mouseOutHandler);
     },
     render(h) {
       return null

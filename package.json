@@ -22,6 +22,7 @@
     "highlight.js": "^9.13.1",
     "js-cookie": "^2.2.0",
     "leaflet": "^1.4.0",
+    "leaflet-ant-path": "^1.2.1",
     "leaflet-rotatedmarker": "^0.2.0",
     "leaflet.layergroup.collision": "^0.3.1",
     "leaflet.markercluster": "^1.4.1",

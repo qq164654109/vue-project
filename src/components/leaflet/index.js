@@ -10,6 +10,8 @@ export { default as LPopup } from './components/popup';
 export { default as LSinglePopup } from './components/singlePopup';
 export { default as LTooltip } from './components/tooltip';
 export { default as LLabelText } from './components/labelText';
+export { default as LPolyline } from './components/polyline';
+export { default as LAntPolyline } from './components/antPolyline';
 export { default as LLayerGroup } from './components/layerGroup';
 export { default as LFeatureGroup } from './components/featureGroup';
 export { default as LGeoJSON } from './components/geoJSON';

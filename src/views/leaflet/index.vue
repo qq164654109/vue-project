@@ -29,6 +29,7 @@
                     <L-label-text :limitZoom="12" :font-style="fontStyle" :hover-style="{color: 'red'}" content="1231231"></L-label-text>
                 </L-marker>
             </L-feature-group>
+            <L-ant-polyline v-if="latLngs" :lat-lngs="latLngs" :paused="antPaused" :pulse-color="pulseColor" @mousemove="onMouseMove" @mouseout="onMouseLeave"></L-ant-polyline>
             <!--<L-marker v-for="(item, index) in markers" :key="index" :lat-lng="item.latLng">-->
                 <!--<L-icon></L-icon>-->
             <!--</L-marker>-->
@@ -36,7 +37,8 @@
                 <!--<L-icon></L-icon>-->
             <!--</L-rotated-marker>-->
             <!--<L-label-geoJSON  v-if="geoLayers" :geo-data="geoLayers" :visible="false" :geo-style="geoStyle" :label-opt="labelOptions" :font-style="labelFontStyle"></L-label-geoJSON>-->
-            <L-geoJSON v-if="geoLayers" :geo-data="geoLayers" :geo-style="geoStyle" @click="onLayerClick" @mousemove="onMouseMove" @mouseout="onMouseLeave">
+            <L-geoJSON v-if="geoLayers" :geo-data="geoLayers" :geo-style="geoStyle" @click="onLayerClick">
+                <!--<L-tooltip :offset="[0, -15]" :content="layerContent"></L-tooltip>-->
             </L-geoJSON>
             <L-wms-tileLayer :url="wmsUrl" :options="{layers: '0,1,2,3,4,5,6,7,8,9,10'}"></L-wms-tileLayer>
         </L-map>
@@ -46,7 +48,7 @@
 <script>
   import axios from 'axios';
   import { LMap, LMarker, LRotatedMarker, LMarkerCollision, LMarkerCluster, LGeoJSON, LLabelGeoJSON, LIcon, LTooltip, LLabelText,
-    LPopup, LSinglePopup, LDivIcon, LWmsTileLayer, LLayerGroup, LFeatureGroup } from '@/components/leaflet';
+    LPopup, LSinglePopup, LDivIcon, LWmsTileLayer, LPolyline, LAntPolyline, LLayerGroup, LFeatureGroup } from '@/components/leaflet';
   import popup from './parts/popup'
 
   export default {
@@ -84,7 +86,10 @@
         layerContent: '22222',
         fontStyle: {
           color: '#409eff'
-        }
+        },
+        latLngs: null,
+        antPaused: false,
+        pulseColor: 'red'
       }
     },
     methods: {
@@ -96,18 +101,18 @@
       },
       onLayerClick(e) {
         console.log(e);
-        this.layerContent = e.layer.feature.properties.PSIZE
       },
       onMouseMove(e) {
-        e.layer.setStyle({
-          color: 'red'
-        })
+        this.pulseColor = '#fff'
       },
       onMouseLeave(e) {
-        e.target.resetStyle(e.layer);
+        this.pulseColor = 'red'
       },
       test(a) {
         this.fontStyle.color = 'red'
+      },
+      alertA() {
+        alert('1111')
       }
     },
     mounted() {
@@ -149,6 +154,13 @@
           latLng: [31.38, 118.38],
         }
       ];
+      this.latLngs = [
+        [31.32, 118.20],
+        [31.36, 118.16],
+        [31.38, 118.24],
+        [31.38, 118.30],
+        [31.36, 118.36]
+      ]
       setTimeout(() => {
         // this.zoom = 14
         this.layerOffset = [0, 20];
@@ -171,6 +183,8 @@
       LLabelText,
       LPopup,
       LSinglePopup,
+      LPolyline,
+      LAntPolyline,
       LLayerGroup,
       LFeatureGroup,
       popup

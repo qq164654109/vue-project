@@ -77,10 +77,12 @@
       },
       setParentHoverListener() {
         this._mouseOverHandler = () => {
+          if (!this.layer.getElement()) return;
           const $textWrapper = this.layer.getElement().querySelector('.text-wrapper');
           $textWrapper.style = this.hoverFontStyleStr;
         };
         this._mouseOutHandler = () => {
+          if (!this.layer.getElement()) return;
           const $textWrapper = this.layer.getElement().querySelector('.text-wrapper');
           $textWrapper.style = this.resetfontStyleStr;
         };

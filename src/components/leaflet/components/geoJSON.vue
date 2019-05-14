@@ -14,6 +14,18 @@
       geoStyle: {
         type: [Object, Function],
         default: null
+      },
+      pointToLayer: {
+        type: Function,
+        default: null
+      },
+      onEachFeature: {
+        type: Function,
+        default: null
+      },
+      filter: {
+        type: Function,
+        default: null
       }
     },
     data() {
@@ -24,12 +36,15 @@
     mounted() {
       const options = optionsMerger(this, {
         ...this.layerOptions,
-        style: this.geoStyle
+        style: this.geoStyle,
+        pointToLayer: this.pointToLayer,
+        onEachFeature: this.onEachFeature,
+        filter: this.filter
       });
 
       this.layer = geoJSON(this.geoData, options);
       DomEvent.on(this.layer, this.$listeners);
-      propsWatchBind(this, this.layer, this.$options.props);
+      propsWatchBind(this, this.layer);
       this.parentLayer = this.$parent.layer;
       this.visible && this.parentLayer.addLayer(this.layer);
 

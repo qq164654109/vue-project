@@ -3,10 +3,10 @@
   import { popup, DomEvent, Map } from 'leaflet';
   import layerMixin from '../mixins/layer';
   import divOverlayMixin from '../mixins/divOverlay';
-  import { optionsMerger, propsWatchBind } from "../utils/index";
+  import propsMixin from '../mixins/props';
 
   export default {
-    mixins: [layerMixin, divOverlayMixin],
+    mixins: [layerMixin, divOverlayMixin, propsMixin],
     inject: ['getMap'],
     props: {
       pane: {
@@ -75,7 +75,7 @@
       }
     },
     mounted() {
-      const options = optionsMerger(this, {
+      const options = this.mergeProps({
         ...this.layerOptions,
         offset: this.offset,
         maxWidth: this.maxWidth,
@@ -88,7 +88,7 @@
 
       this.layer = popup(options);
       DomEvent.on(this.layer, this.$listeners);
-      propsWatchBind(this, this.layer, this.$options.props);
+      this.bindPropsWatch();
       this.setContent();
       this.parentLayer = this.$parent.layer;
       this.layer.setLatLng(this.latLng);

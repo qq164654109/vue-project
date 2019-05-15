@@ -1,9 +1,10 @@
 <script>
-  import '../utils/Leaflet.LayerGroup.Collision';
+  import '../plugins/Leaflet.LayerGroup.Collision';
   import { layerGroup, DomEvent } from 'leaflet';
-  import { propsWatchBind } from '../utils';
+  import propsMixin from '../mixins/props';
 
   export default {
+    mixins: [propsMixin],
     props: {
       margin: {
         type: Number,
@@ -19,6 +20,22 @@
         ready: false
       }
     },
+    mounted() {
+      this.layer = layerGroup.collision({ margin : this.margin });
+
+      DomEvent.on(this.layer, this.$listeners);
+      this.bindPropsWatch();
+      this.parentLayer = this.$parent.layer;
+      this.visible && this.parentLayer.addLayer(this.layer);
+
+      this.$nextTick(() => {
+        this.ready = true;
+        this.$emit('loaded', this.layer)
+      })
+    },
+    beforeDestroy() {
+      this.parentLayer && this.parentLayer.removeLayer(this.layer);
+    },
     methods: {
       addLayer(layer) {
         this.layer && this.layer.addLayer(layer)
@@ -33,22 +50,6 @@
           this.parentLayer.removeLayer(this.layer);
         }
       }
-    },
-    mounted() {
-      this.layer = layerGroup.collision({ margin : this.margin });
-
-      DomEvent.on(this.layer, this.$listeners);
-      propsWatchBind(this, this.layer, this.$options.props);
-      this.parentLayer = this.$parent.layer;
-      this.visible && this.parentLayer.addLayer(this.layer);
-
-      this.$nextTick(() => {
-        this.ready = true;
-        this.$emit('loaded', this.layer)
-      })
-    },
-    beforeDestroy() {
-      this.parentLayer && this.parentLayer.removeLayer(this.layer);
     },
     render(h) {
       if (this.ready && this.$slots.default) {

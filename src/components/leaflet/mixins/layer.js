@@ -13,6 +13,16 @@ export default {
       default: true
     }
   },
+  mounted() {
+    this.layerOptions = {
+      pane: this.pane,
+      attribution: this.attribution
+    }
+  },
+  beforeDestroy() {
+    this.layer.off();
+    this.parentLayer && this.parentLayer.removeLayer(this.layer);
+  },
   methods: {
     setVisible(newVal, oldVal) {
       if (newVal === oldVal) return;
@@ -26,12 +36,6 @@ export default {
     },
     getLayer() {
       return this.layer;
-    }
-  },
-  mounted() {
-    this.layerOptions = {
-      pane: this.pane,
-      attribution: this.attribution
     }
   }
 }

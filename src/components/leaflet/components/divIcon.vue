@@ -1,7 +1,8 @@
 <script>
-  import { divIcon } from 'leaflet';
+  import { divIcon, setOptions } from 'leaflet';
   import iconMixin from '../mixins/icon';
-  import { optionsMerger, propsWatchBind, objToStyleStr } from "../utils/index";
+  import propsMixin from '../mixins/props';
+  import { objToStyleStr } from "../utils/index";
 
   const defaultFontStyle = {
     fontSize: '16px',
@@ -13,7 +14,7 @@
   };
 
   export default {
-    mixins: [iconMixin],
+    mixins: [iconMixin, propsMixin],
     props: {
       html: {
         type: String,
@@ -22,26 +23,20 @@
       bgPos: {
         type: Array,
         default: () => []
-      },
-      fontStyle: {
-        type: Object,
-        default: () => {}
       }
     },
     mounted() {
       const html = this.$el.innerHTML ? this.$el.innerHTML : this.html;
-      const fontStyleStr = objToStyleStr({...defaultFontStyle, ...this.fontStyle});
-      const options = optionsMerger(this, {
+      const options = this.mergeProps({
         ...this.iconOptions,
-        html: `<div class="font-wrapper" style="${fontStyleStr}">${html}</div>`,
+        html,
         bgPos: this.bgPos
       });
+      const icon = divIcon(options);
 
-      const LIcon = divIcon(options);
-      propsWatchBind(this, LIcon, this.$options.props);
-      const parentLayer = this.$parent.layer;
-
-      parentLayer.setIcon(LIcon)
+      this.parentLayer = this.$parent.layer;
+      this.parentLayer.setIcon(icon);
+      this.bindPropsWatch();
     },
     render(h) {
       if (this.$slots.default) {

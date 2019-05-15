@@ -6,10 +6,11 @@
 
 <script>
   import 'leaflet/dist/leaflet.css';
-  import { map, DomEvent, CRS } from 'leaflet';
-  import { optionsMerger, propsWatchBind } from "../utils/index";
+  import { map, control, DomEvent, CRS } from 'leaflet';
+  import propsMixin from '../mixins/props';
 
   export default {
+    mixins: [propsMixin],
     provide() {
       return {
         getMap: this.getMap
@@ -44,11 +45,23 @@
         type: Array,
         default: () => []
       },
+      doubleClickZoom: {
+        type: Boolean,
+        default: false
+      },
+      dragging: {
+        type: Boolean,
+        default: true
+      },
       crs: {
         type: Object,
         default: () => CRS.EPSG3857
       },
       panes: {
+        type: Array,
+        default: () => []
+      },
+      plugins: {
         type: Array,
         default: () => []
       }
@@ -57,6 +70,34 @@
       return {
         ready: false
       }
+    },
+    mounted() {
+      const options = this.mergeProps({
+        center: this.center,
+        zoom: this.zoom,
+        minZoom: this.minZoom,
+        maxZoom: this.maxZoom,
+        zoomSnap: this.zoomSnap,
+        doubleClickZoom: this.doubleClickZoom,
+        dragging: this.dragging,
+        crs: this.crs
+      });
+
+      this.layer = map(this.id, options);
+      this.createPanes(this.panes);
+      this.addMoveEndListener();
+      DomEvent.on(this.layer, this.$listeners);
+      this.bindPropsWatch();
+      this.addPlugins();
+
+      this.$nextTick(() => {
+        this.ready = true;
+        this.$emit('loaded');
+      })
+    },
+    beforeDestroy() {
+      this.layer.off();
+      this.layer.remove();
     },
     methods: {
       setCenter(newVal, oldVal) {
@@ -88,47 +129,40 @@
         }
       },
       createPanes(paneNames) {
-        paneNames.forEach(name => {
-          this.layer.createPane(name)
+        paneNames.forEach(pName => {
+          this.layer.createPane(pName)
         })
       },
-      moveEndHandler() {
-        const center = this.layer.getCenter();
-        const zoom = this.layer.getZoom();
+      toggleMeasure() {
+        if (!this.measureControl) {
+          this.measureControl = control.linearMeasurement({
+            unitSystem: 'metric',
+            color: '#78a4ff',
+            fillColor: 'red'
+          }).addTo(this.layer);
+        }
+        this.measureControl.toggleMeasure();
+      },
+      addMoveEndListener() {
+        this._moveEndHandler = () => {
+          const center = this.layer.getCenter();
+          const zoom = this.layer.getZoom();
 
-        this.$emit('update:center', center);
-        this.$emit('update:zoom', zoom);
+          this.$emit('update:center', center);
+          this.$emit('update:zoom', zoom);
+        };
+        this.layer.on('moveend', this._moveEndHandler);
+      },
+      addPlugins() {
+        this.plugins.forEach(pName => {
+          import(`../plugins/leaflet.${pName}.scss`).catch(() => {});
+          import(`../plugins/leaflet.${pName}.js`).catch(() => {});
+        })
       },
       getMap() {
         return this.layer
       }
     },
-    mounted() {
-      const options = optionsMerger(this, {
-        center: this.center,
-        zoom: this.zoom,
-        minZoom: this.minZoom,
-        maxZoom: this.maxZoom,
-        zoomSnap: this.zoomSnap,
-        crs: this.crs
-      });
-
-      this.layer = map(this.id, options);
-      this.layer.on('moveend', this.moveEndHandler);
-      this.createPanes(this.panes);
-      DomEvent.on(this.layer, this.$listeners);
-      propsWatchBind(this, this.layer, this.$options.props);
-
-      this.$nextTick(() => {
-        this.ready = true;
-        this.$emit('loaded');
-      })
-    },
-    beforeDestroy() {
-      console.log(111)
-      console.log(this.layer.destroy)
-      // this.layer.destroy();
-    }
   }
 </script>
 

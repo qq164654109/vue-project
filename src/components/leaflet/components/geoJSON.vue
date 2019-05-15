@@ -1,10 +1,10 @@
 <script>
   import { geoJSON, DomEvent } from 'leaflet';
   import layerMixin from '../mixins/layer';
-  import { optionsMerger, propsWatchBind } from "../utils/index";
+  import propsMixin from '../mixins/props';
 
   export default {
-    mixins: [layerMixin],
+    mixins: [layerMixin, propsMixin],
     inject: ['getMap'],
     props: {
       geoData: {
@@ -34,7 +34,7 @@
       }
     },
     mounted() {
-      const options = optionsMerger(this, {
+      const options = this.mergeProps({
         ...this.layerOptions,
         style: this.geoStyle,
         pointToLayer: this.pointToLayer,
@@ -44,7 +44,7 @@
 
       this.layer = geoJSON(this.geoData, options);
       DomEvent.on(this.layer, this.$listeners);
-      propsWatchBind(this, this.layer);
+      this.bindPropsWatch();
       this.parentLayer = this.$parent.layer;
       this.visible && this.parentLayer.addLayer(this.layer);
 
@@ -53,9 +53,6 @@
         this.$emit('loaded', this.layer)
       })
 
-    },
-    beforeDestroy() {
-      this.parentLayer && this.parentLayer.removeLayer(this.layer);
     },
     render(h) {
       if (this.ready && this.$slots.default) {

@@ -3,9 +3,10 @@
   import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
   import 'leaflet.markercluster';
   import { markerClusterGroup, DomEvent } from 'leaflet';
-  import { optionsMerger, propsWatchBind } from '../utils';
+  import propsMixin from '../mixins/props';
 
   export default {
+    mixins: [propsMixin],
     props: {
       options: {
         type: Object,
@@ -47,12 +48,12 @@
       }
     },
     mounted() {
-      const options = optionsMerger(this, {
+      const options = this.mergeProps({
         iconCreateFunction: this.iconCreate
       });
 
       this.layer = markerClusterGroup(options);
-      propsWatchBind(this, this.layer);
+      this.bindPropsWatch();
       DomEvent.on(this.layer, this.$listeners);
       this.parentLayer = this.$parent.layer;
       this.visible && this.parentLayer.addLayer(this.layer);

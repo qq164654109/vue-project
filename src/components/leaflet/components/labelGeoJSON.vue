@@ -1,11 +1,11 @@
 <script>
-  import '../utils/ctxtextpath';
-  import '../utils/L.LabelTextCollision';
-  import '../utils/Leaflet.streetlabels';
+  import '../plugins/ctxtextpath';
+  import '../plugins/L.LabelTextCollision';
+  import '../plugins/Leaflet.streetlabels';
 
   import { geoJSON, DomEvent, StreetLabels } from 'leaflet';
   import layerMixin from '../mixins/layer';
-  import { optionsMerger, propsWatchBind } from "../utils/index";
+  import propsMixin from '../mixins/props';
 
   const defaultLabelOpt = {
     collisionFlg: true,
@@ -26,7 +26,7 @@
   }
 
   export default {
-    mixins: [layerMixin],
+    mixins: [layerMixin, propsMixin],
     inject: ['getMap'],
     props: {
       geoData: {
@@ -56,7 +56,7 @@
 
       this.labelsRenderer = new StreetLabels(labelOptions);
 
-      const options = optionsMerger(this, {
+      const options = this.mergeProps({
         ...this.layerOptions,
         style: this.geoStyle,
         renderer: this.labelsRenderer
@@ -64,7 +64,7 @@
 
       this.layer = geoJSON(this.geoData, options);
       DomEvent.on(this.layer, this.$listeners);
-      propsWatchBind(this, this.layer, this.$options.props);
+      this.bindPropsWatch();
       this.parentLayer = this.$parent.layer;
       this.visible && this.parentLayer.addLayer(this.layer);
 
@@ -73,9 +73,6 @@
         this.$emit('loaded', this.layer)
       })
 
-    },
-    beforeDestroy() {
-      this.parentLayer && this.parentLayer.removeLayer(this.layer);
     },
     render(h) {
       if (this.ready && this.$slots.default) {

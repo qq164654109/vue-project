@@ -3,10 +3,10 @@
   import { tooltip, DomEvent } from 'leaflet';
   import layerMixin from '../mixins/layer';
   import divOverlayMixin from '../mixins/divOverlay';
-  import { optionsMerger, propsWatchBind } from "../utils/index";
+  import propsMixin from '../mixins/props';
 
   export default {
-    mixins: [layerMixin, divOverlayMixin],
+    mixins: [layerMixin, divOverlayMixin, propsMixin],
     inject: ['getMap'],
     props: {
       pane: {
@@ -41,6 +41,40 @@
         type: Boolean,
         default: false
       }
+    },
+    mounted() {
+      const options = this.mergeProps({
+        ...this.layerOptions,
+        ...this.divOverlayOptions,
+        permanent: this.permanent,
+        sticky: this.sticky,
+        direction: this.direction,
+        opacity: this.opacity
+      });
+
+      this.layer = tooltip(options);
+      DomEvent.on(this.layer, this.$listeners);
+      this.bindPropsWatch();
+      this.setContent();
+      this.parentLayer = this.$parent.layer;
+      if (this.permanent && !!this.limitZoom) {
+        this.addZoomVisibleListener();
+      } else {
+        this.visible && this.parentLayer.bindTooltip(this.layer);
+      }
+      if (this.pointEvents) {
+        const tooltipEle = this.layer.getElement();
+        tooltipEle.style.pointerEvents = 'auto'
+      }
+
+      this.$nextTick(() => {
+        this.$emit('loaded', this.layer)
+      })
+    },
+    beforeDestroy() {
+      !!this.tooltipComp && this.tooltipComp.$destroy();
+      !!this.parentLayer && this.parentLayer.unbindTooltip();
+      !!this._zoomEndHandler && this.LMap.off('zoomend', this._zoomEndHandler);
     },
     methods: {
       setContent() {
@@ -79,7 +113,7 @@
           this.parentLayer.unbindTooltip(this.layer);
         }
       },
-      setZoomVisibleListener() {
+      addZoomVisibleListener() {
         this.LMap = this.getMap();
         this.zoomVisible = false;
         this._zoomEndHandler = () => {
@@ -95,40 +129,6 @@
         this._zoomEndHandler();
         this.LMap.on('zoomend', this._zoomEndHandler);
       }
-    },
-    mounted() {
-      const options = optionsMerger(this, {
-        ...this.layerOptions,
-        ...this.divOverlayOptions,
-        permanent: this.permanent,
-        sticky: this.sticky,
-        direction: this.direction,
-        opacity: this.opacity
-      });
-
-      this.layer = tooltip(options);
-      DomEvent.on(this.layer, this.$listeners);
-      propsWatchBind(this, this.layer, this.$options.props);
-      this.setContent();
-      this.parentLayer = this.$parent.layer;
-      if (this.permanent && !!this.limitZoom) {
-        this.setZoomVisibleListener();
-      } else {
-        this.visible && this.parentLayer.bindTooltip(this.layer);
-      }
-      if (this.pointEvents) {
-        const tooltipEle = this.layer.getElement();
-        tooltipEle.style.pointerEvents = 'auto'
-      }
-
-      this.$nextTick(() => {
-        this.$emit('loaded', this.layer)
-      })
-    },
-    beforeDestroy() {
-      !!this.tooltipComp && this.tooltipComp.$destroy();
-      !!this.parentLayer && this.parentLayer.unbindTooltip();
-      !!this._zoomEndHandler && this.LMap.off('zoomend', this._zoomEndHandler);
     },
     render(h) {
       const slots = this.$slots.default || [];

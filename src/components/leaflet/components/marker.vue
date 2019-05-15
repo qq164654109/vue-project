@@ -1,10 +1,10 @@
 <script>
   import { marker, DomEvent } from 'leaflet';
   import layerMixin from '../mixins/layer';
-  import { optionsMerger, propsWatchBind } from "../utils/index";
+  import propsMixin from '../mixins/props';
 
   export default {
-      mixins: [layerMixin],
+      mixins: [layerMixin, propsMixin],
       props: {
         pane: {
           type: String,
@@ -16,13 +16,15 @@
         },
         latLng: {
           type: [Object, Array],
-          custom: true,
           default: null
         },
         zIndexOffset: {
           type: Number,
-          custom: false,
           default: null
+        },
+        riseOnHover: {
+          type: Boolean,
+          default: false
         }
       },
       data() {
@@ -30,21 +32,17 @@
           ready: false
         }
       },
-      methods: {
-        setLatLng(newVal, oldVal) {
-          this.layer.setLatLng(newVal);
-        }
-      },
       mounted() {
-        const options = optionsMerger(this, {
+        const options = this.mergeProps(this, {
           ...this.layerOptions,
           draggable: this.draggable,
-          zIndexOffset: this.zIndexOffset
+          zIndexOffset: this.zIndexOffset,
+          riseOnHover: this.riseOnHover
         });
 
         this.layer = marker(this.latLng, options);
         DomEvent.on(this.layer, this.$listeners);
-        propsWatchBind(this, this.layer, this.$options.props);
+        this.bindPropsWatch();
         this.parentLayer = this.$parent.layer;
         this.visible && this.parentLayer.addLayer(this.layer);
 
@@ -53,8 +51,10 @@
           this.$emit('loaded', this.layer)
         })
       },
-      beforeDestroy() {
-        this.parentLayer && this.parentLayer.removeLayer(this.layer);
+      methods: {
+        setLatLng(newVal, oldVal) {
+          this.layer.setLatLng(newVal);
+        }
       },
       render(h) {
         if (this.ready && this.$slots.default) {

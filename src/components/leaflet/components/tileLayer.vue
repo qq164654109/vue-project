@@ -2,10 +2,11 @@
     import { tileLayer, DomEvent } from 'leaflet';
     import layerMixin from '../mixins/layer';
     import gridLayerMixin from '../mixins/gridLayer';
-    import { TILE_URL, optionsMerger, propsWatchBind } from "../utils/index";
+    import propsMixin from '../mixins/props';
+    import { TILE_URL } from "../utils/index";
 
     export default {
-      mixins: [layerMixin, gridLayerMixin],
+      mixins: [layerMixin, gridLayerMixin, propsMixin],
       props: {
         url: {
           type: String,
@@ -22,10 +23,14 @@
         tileLayerClass: {
           type: Function,
           default: tileLayer
+        },
+        options: {
+          type: Object,
+          default: () => {}
         }
       },
       mounted() {
-        const options = optionsMerger(this, {
+        const options = this.mergeProps({
           ...this.layerOptions,
           ...this.gridLayerOptions,
           minZoom: this.minZoom,
@@ -33,16 +38,13 @@
         });
         this.layer = this.tileLayerClass(this.url, options);
         DomEvent.on(this.layer, this.$listeners);
-        propsWatchBind(this, this.layer, this.$options.props);
+        this.bindPropsWatch();
         this.parentLayer = this.$parent.layer;
         this.visible && this.parentLayer.addLayer(this.layer);
 
         this.$nextTick(() => {
           this.$emit('loaded', this.layer)
         })
-      },
-      beforeDestroy() {
-        this.parentLayer && this.parentLayer.removeLayer(this.layer);
       },
       render(h) {
         return null

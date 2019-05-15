@@ -1,10 +1,10 @@
 <script>
   import { layerGroup, DomEvent } from 'leaflet';
   import layerMixin from '../mixins/layer';
-  import { optionsMerger, propsWatchBind } from "../utils/index";
+  import propsMixin from '../mixins/props';
 
   export default {
-    mixins: [layerMixin],
+    mixins: [layerMixin, propsMixin],
     data() {
       return {
         ready: false
@@ -16,13 +16,13 @@
       }
     },
     mounted() {
-      const options = optionsMerger(this, {
+      const options = this.mergeProps(this, {
         ...this.layerOptions
       });
 
       this.layer = layerGroup([], options);
       DomEvent.on(this.layer, this.$listeners);
-      propsWatchBind(this, this.layer, this.$options.props);
+      this.bindPropsWatch();
       this.parentLayer = this.$parent.layer;
       this.visible && this.parentLayer.addLayer(this.layer);
 
@@ -30,9 +30,6 @@
         this.ready = true;
         this.$emit('loaded', this.layer)
       })
-    },
-    beforeDestroy() {
-      this.parentLayer && this.parentLayer.removeLayer(this.layer);
     },
     render(h) {
       if (this.ready && this.$slots.default) {

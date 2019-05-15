@@ -2,10 +2,10 @@
     import { polyline, DomEvent } from 'leaflet';
     import layerMixin from '../mixins/layer';
     import pathMixin from '../mixins/path';
-    import { optionsMerger, propsWatchBind } from "../utils";
+    import propsMixin from '../mixins/props';
 
     export default {
-      mixins: [layerMixin, pathMixin],
+      mixins: [layerMixin, pathMixin, propsMixin],
       data() {
         return {
           ready: false
@@ -26,7 +26,7 @@
         }
       },
       mounted() {
-        const options = optionsMerger(this, {
+        const options = this.mergeProps({
           ...this.layerOptions,
           ...this.pathOptions,
           smoothFactor: this.smoothFactor,
@@ -35,7 +35,7 @@
 
         this.layer = polyline(this.latLngs, options);
         DomEvent.on(this.layer, this.$listeners);
-        propsWatchBind(this, this.layer);
+        this.bindPropsWatch();
         this.parentLayer = this.$parent.layer;
         this.visible && this.parentLayer.addLayer(this.layer);
 
@@ -43,9 +43,6 @@
           this.ready = true;
           this.$emit('loaded', this.layer)
         })
-      },
-      beforeDestroy() {
-        this.parentLayer && this.parentLayer.removeLayer(this.layer);
       },
       render(h) {
         if (this.ready && this.$slots.default) {

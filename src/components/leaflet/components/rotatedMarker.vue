@@ -2,10 +2,10 @@
   import 'leaflet-rotatedmarker';
   import { marker, DomEvent } from 'leaflet';
   import layerMixin from '../mixins/layer';
-  import { optionsMerger, propsWatchBind } from "../utils/index";
+  import propsMixin from '../mixins/props';
 
   export default {
-    mixins: [layerMixin],
+    mixins: [layerMixin, propsMixin],
     props: {
       pane: {
         type: String,
@@ -38,7 +38,7 @@
       }
     },
     mounted() {
-      const options = optionsMerger(this, {
+      const options = this.mergeProps({
         ...this.layerOptions,
         draggable: this.draggable,
         zIndexOffset: this.zIndexOffset,
@@ -48,7 +48,7 @@
 
       this.layer = marker(this.latLng, options);
       DomEvent.on(this.layer, this.$listeners);
-      propsWatchBind(this, this.layer, this.$options.props);
+      this.bindPropsWatch();
       this.parentLayer = this.$parent.layer;
       this.visible && this.parentLayer.addLayer(this.layer);
 
@@ -56,9 +56,6 @@
         this.ready = true;
         this.$emit('loaded', this.layer)
       })
-    },
-    beforeDestroy() {
-      this.parentLayer && this.parentLayer.removeLayer(this.layer);
     },
     render(h) {
       if (this.ready && this.$slots.default) {

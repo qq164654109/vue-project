@@ -2,7 +2,8 @@
   import { tooltip, DomEvent } from 'leaflet';
   import layerMixin from '../mixins/layer';
   import divOverlayMixin from '../mixins/divOverlay';
-  import { optionsMerger, propsWatchBind, objToStyleStr} from "../utils/index";
+  import propsMixin from '../mixins/props';
+  import { objToStyleStr } from "../utils/index";
 
   const defaultFontStyle = {
     color: '#1a1a1a',
@@ -12,7 +13,7 @@
   };
 
   export default {
-    mixins: [layerMixin, divOverlayMixin],
+    mixins: [layerMixin, divOverlayMixin, propsMixin],
     inject: ['getMap'],
     props: {
       pane: {
@@ -45,7 +46,7 @@
       }
     },
     mounted() {
-      const options = optionsMerger(this, {
+      const options = this.mergeProps({
         ...this.layerOptions,
         ...this.divOverlayOptions,
         permanent: true,
@@ -59,16 +60,16 @@
 
       this.layer = tooltip(options);
       DomEvent.on(this.layer, this.$listeners);
-      propsWatchBind(this, this.layer, this.$options.props);
+      this.bindPropsWatch();
       this.layer.setContent(`<div class="font-wrapper" style="${this.resetfontStyleStr}">${this.content}</div>`);
       this.parentLayer = this.$parent.layer;
       if (!!this.limitZoom) {
-        this.setZoomVisibleListener();
+        this.addZoomVisibleListener();
       } else {
         this.visible && this.parentLayer.bindTooltip(this.layer);
       }
       if (Object.keys(this.hoverStyle).length > 0) {
-        this.setParentHoverListener()
+        this.addParentHoverListener()
       }
 
       this.$nextTick(() => {
@@ -96,7 +97,7 @@
           this.parentLayer.unbindTooltip(this.layer);
         }
       },
-      setZoomVisibleListener() {
+      addZoomVisibleListener() {
         this.LMap = this.getMap();
         this.zoomVisible = false;
         this._zoomEndHandler = () => {
@@ -112,7 +113,7 @@
         this._zoomEndHandler();
         this.LMap.on('zoomend', this._zoomEndHandler);
       },
-      setParentHoverListener() {
+      addParentHoverListener() {
         this._mouseOverHandler = () => {
           if (!this.layer.getElement()) return;
           const $textWrapper = this.layer.getElement().querySelector('.font-wrapper');

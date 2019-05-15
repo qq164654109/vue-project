@@ -3,18 +3,19 @@
         <div class="test-btn">
             <el-button @click="test">测试</el-button>
         </div>
-        <L-map ref="map" :id="mapId" :zoom="zoom" :center="center" :min-zoom="minZoom" :max-zoom="maxZoom">
-            <!--<L-single-popup :lat-lng="[31.323, 118.184]" :visible="layerVisible">-->
-                <!--<popup></popup>-->
+        <L-map ref="map" :id="mapId" :center="center" :zoom="zoom" :min-zoom="minZoom" :max-zoom="maxZoom">
+            <!--<L-single-popup :lat-lng="[31.323, 118.184]" :visible="true">-->
+                <!--<popup a="提示"></popup>-->
             <!--</L-single-popup>-->
-            <!--<L-marker-cluster :options="clusterOptions" :visible="layerVisible">-->
+            <!--<L-marker-cluster :options="clusterOptions">-->
                 <!--<L-marker v-for="(item, index) in markers" :key="index" :lat-lng="item.latLng" >-->
                     <!--<L-icon></L-icon>-->
                 <!--</L-marker>-->
             <!--</L-marker-cluster>-->
             <!--<L-marker v-for="(item, index) in markers" :key="index" :lat-lng="item.latLng">-->
+                <!--&lt;!&ndash;<L-div-icon :font-style="fontStyle"></L-div-icon>&ndash;&gt;-->
+                <!--&lt;!&ndash;<L-tooltip :permanent="true" :offset="[0, -15]" :content="layerContent"></L-tooltip>&ndash;&gt;-->
                 <!--<L-icon></L-icon>-->
-                <!--<L-tooltip :permanent="true" :offset="[0, -15]" :content="layerContent"></L-tooltip>-->
             <!--</L-marker>-->
             <!--<L-marker-collision :margin="5" :visible="layerVisible">-->
                 <!--<L-marker v-for="(item, index) in markers" :key="index" :lat-lng="item.latLng">-->
@@ -23,24 +24,27 @@
                 <!--</L-marker>-->
             <!--</L-marker-collision>-->
             <L-feature-group>
-                <L-popup :content="layerContent"><div @click="onLayerClick">adadad</div></L-popup>
+                <L-popup :content="layerContent" :visible="layerVisible"><div @click="onLayerClick">adadad</div></L-popup>
                 <L-marker v-for="(item, index) in markers" :key="index" :lat-lng="item.latLng">
-                    <L-icon></L-icon>
-                    <!--<L-div-icon :font-style="{color: '#409eff', fontSize: '20px'}" :icon-size="[53, 30]"><i class='el-icon-location'></i>tips</L-div-icon>-->
+                    <!--<L-icon></L-icon>-->
+                    <L-div-icon :icon-size="[53, 30]"><div style="font-size: 16px; text-align: center; line-height: 1;"><i class='el-icon-location'></i>tips</div></L-div-icon>
+                    <L-tooltip :permanent="true" :offset="[0, -15]" :content="layerContent" ></L-tooltip>
                 </L-marker>
             </L-feature-group>
-            <!--<L-ant-polyline v-if="latLngs" :lat-lngs="latLngs" :paused="antPaused" :pulse-color="pulseColor" @mousemove="onMouseMove" @mouseout="onMouseLeave"></L-ant-polyline>-->
+            <L-ant-polyline v-if="latLngs" :lat-lngs="latLngs" :paused="antPaused" :pulse-color="pulseColor" @mousemove="onMouseMove" @mouseout="onMouseLeave" @click="test">
+                <L-tooltip>{{layerContent}}</L-tooltip>
+            </L-ant-polyline>
             <!--<L-marker v-for="(item, index) in markers" :key="index" :lat-lng="item.latLng">-->
                 <!--<L-icon></L-icon>-->
             <!--</L-marker>-->
             <!--<L-rotated-marker v-for="(item, index) in markers" :key="index" :lat-lng="item.latLng" :angle="45">-->
                 <!--<L-icon></L-icon>-->
             <!--</L-rotated-marker>-->
-            <!--<L-label-geoJSON  v-if="geoLayers" :geo-data="geoLayers" :visible="false" :geo-style="geoStyle" :label-opt="labelOptions" :font-style="labelFontStyle"></L-label-geoJSON>-->
+            <!--<L-label-geoJSON  v-if="geoLayers" :geo-data="geoLayers" :visible="layerVisible" :geo-style="geoStyle" :label-opt="labelOptions" :font-style="labelFontStyle"></L-label-geoJSON>-->
             <!--<L-geoJSON v-if="geoLayers" :geo-data="geoLayers" :geo-style="geoStyle" @click="onLayerClick">-->
                 <!--&lt;!&ndash;<L-tooltip :offset="[0, -15]" :content="layerContent"></L-tooltip>&ndash;&gt;-->
             <!--</L-geoJSON>-->
-            <L-tileLayer :url="tileUrl1" :options="{subdomains: ['0', '1', '2', '3', '4', '5', '6', '7']}" :max-zoom="20" :min-zoom="2" :opacity=".8"></L-tileLayer>
+            <!--<L-tileLayer :url="tileUrl1" :options="{subdomains: ['0', '1', '2', '3', '4', '5', '6', '7']}" :max-zoom="20" :min-zoom="2" :opacity=".8"></L-tileLayer>-->
             <L-tileLayer :url="tileUrl2" :options="{subdomains: ['0', '1', '2', '3', '4', '5', '6', '7']}" :max-zoom="20" :min-zoom="2" :opacity=".8"></L-tileLayer>
         </L-map>
     </div>
@@ -90,12 +94,15 @@
           dynamicFontSize: true,
           fontSize: 8
         },
-        layerVisible: false,
+        layerVisible: true,
         layerOffset: [0, 0],
         layerOpacity: 1,
         layerContent: '22222',
         fontStyle: {
           color: '#409eff'
+        },
+        activeStyle: {
+          color: '#97ff76'
         },
         latLngs: null,
         antPaused: false,
@@ -113,13 +120,18 @@
         console.log(e);
       },
       onMouseMove(e) {
-        this.pulseColor = '#8FFFA4'
+        this.layerContent = '33333333333333'
+        e.layer.setStyle({
+          pulseColor: '#8FFFA4'
+        });
       },
       onMouseLeave(e) {
-        this.pulseColor = '#FFFFFF'
+        e.layer.setStyle({
+          pulseColor: '#FFFFFF'
+        });
       },
       test(a) {
-        alert(1)
+        this.$refs.map.toggleMeasure();
       },
       alertA() {
         alert('1111')
@@ -170,14 +182,15 @@
         [31.38, 118.24],
         [31.38, 118.30],
         [31.36, 118.36]
-      ]
-      setTimeout(() => {
-        // this.zoom = 14
-        this.layerOffset = [0, 20];
-        this.layerOpacity = 0.2;
-        this.layerVisible = true;
-      }, 1000);
-      this.getGeoJsonData();
+      ];
+      // setTimeout(() => {
+      //   // this.zoom = 14
+      //   this.layerOffset = [0, 20];
+      //   this.layerOpacity = 0.2;
+      //   this.zoom = 12;
+      //   this.fontStyle.color = 'red'
+      // }, 1000);
+      //this.getGeoJsonData();
     },
     components: {
       LMap,

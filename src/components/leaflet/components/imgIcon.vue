@@ -1,23 +1,36 @@
 <script>
   import { icon } from 'leaflet';
   import iconMixin from '../mixins/icon';
-  import { ICON_DEFAULT, optionsMerger, propsWatchBind } from "../utils/index";
+  import propsMixin from '../mixins/props';
+  import { ICON_DEFAULT, ICON_SHADOW_DEFAULT } from "../utils/index";
 
   export default {
-    mixins: [iconMixin],
+    mixins: [iconMixin, propsMixin],
     props: {
       iconUrl: {
         type: String,
         default: ICON_DEFAULT
       },
+      shadowUrl: {
+        type: String,
+        default: ICON_SHADOW_DEFAULT
+      },
+      shadowSize: {
+        type: Array,
+        default: () => [30, 30]
+      },
+      shadowAnchor: {
+        type: Array,
+        default: () => [10, 14]
+      }
     },
     mounted() {
-      const options = optionsMerger(this, {
+      const options = this.mergeProps({
         ...this.iconOptions
       });
-
       const LIcon = icon(options);
-      propsWatchBind(this, LIcon, this.$options.props);
+
+      this.bindPropsWatch();
       const parentLayer = this.$parent.layer;
       parentLayer.setIcon(LIcon)
     },

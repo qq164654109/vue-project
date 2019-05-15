@@ -3,10 +3,10 @@
   import { popup, DomEvent } from 'leaflet';
   import layerMixin from '../mixins/layer';
   import divOverlayMixin from '../mixins/divOverlay';
-  import { optionsMerger, propsWatchBind } from "../utils/index";
+  import propsMixin from '../mixins/props';
 
   export default {
-    mixins: [layerMixin, divOverlayMixin],
+    mixins: [layerMixin, divOverlayMixin, propsMixin],
     inject: ['getMap'],
     props: {
       pane: {
@@ -42,6 +42,33 @@
         default: true
       }
     },
+    mounted() {
+      const options = this.mergeProps({
+        ...this.layerOptions,
+        offset: this.offset,
+        maxWidth: this.maxWidth,
+        minWidth: this.minWidth,
+        maxHeight: this.maxHeight,
+        closeButton: this.closeButton,
+        autoClose: this.autoClose,
+        closeOnClick: this.closeOnClick
+      });
+
+      this.layer = popup(options);
+      DomEvent.on(this.layer, this.$listeners);
+      this.bindPropsWatch();
+      this.setContent();
+      this.parentLayer = this.$parent.layer;
+      this.visible && this.parentLayer.bindPopup(this.layer);
+
+      this.$nextTick(() => {
+        this.$emit('loaded', this.layer)
+      })
+    },
+    beforeDestroy() {
+      !!this.popupComp && this.popupComp.$destroy();
+      !!this.parentLayer && this.parentLayer.unbindPopup();
+    },
     methods: {
       setContent() {
         const slots = this.$slots.default || [];
@@ -71,36 +98,10 @@
         if (newVal) {
           this.parentLayer.bindPopup(this.layer);
         } else {
+          this.parentLayer.closePopup();
           this.parentLayer.unbindPopup(this.layer);
         }
       }
-    },
-    mounted() {
-      const options = optionsMerger(this, {
-        ...this.layerOptions,
-        offset: this.offset,
-        maxWidth: this.maxWidth,
-        minWidth: this.minWidth,
-        maxHeight: this.maxHeight,
-        closeButton: this.closeButton,
-        autoClose: this.autoClose,
-        closeOnClick: this.closeOnClick
-      });
-
-      this.layer = popup(options);
-      DomEvent.on(this.layer, this.$listeners);
-      propsWatchBind(this, this.layer, this.$options.props);
-      this.setContent();
-      this.parentLayer = this.$parent.layer;
-      this.visible && this.parentLayer.bindPopup(this.layer);
-
-      this.$nextTick(() => {
-        this.$emit('loaded', this.layer)
-      })
-    },
-    beforeDestroy() {
-      !!this.popupComp && this.popupComp.$destroy();
-      !!this.parentLayer && this.parentLayer.unbindPopup();
     },
     render(h) {
       const slots = this.$slots.default || [];

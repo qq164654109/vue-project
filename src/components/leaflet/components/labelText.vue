@@ -1,6 +1,5 @@
 <script>
   import { tooltip, DomEvent } from 'leaflet';
-  import layerMixin from '../mixins/layer';
   import divOverlayMixin from '../mixins/divOverlay';
   import propsMixin from '../mixins/props';
   import { objToStyleStr } from "../utils/index";
@@ -13,12 +12,16 @@
   };
 
   export default {
-    mixins: [layerMixin, divOverlayMixin, propsMixin],
+    mixins: [divOverlayMixin, propsMixin],
     inject: ['getMap'],
     props: {
       pane: {
         type: String,
         default: 'tooltipPane'
+      },
+      attribution: {
+        type: String,
+        default: null
       },
       content: {
         type: String,
@@ -47,8 +50,8 @@
     },
     mounted() {
       const options = this.mergeProps({
-        ...this.layerOptions,
         ...this.divOverlayOptions,
+        pane: this.pane,
         permanent: true,
         sticky: this.sticky,
         direction: this.direction,

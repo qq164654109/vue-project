@@ -1,12 +1,11 @@
 <script>
   import Vue from 'vue';
-  import { popup, DomEvent, Map } from 'leaflet';
-  import layerMixin from '../mixins/layer';
+  import { popup, DomEvent } from 'leaflet';
   import divOverlayMixin from '../mixins/divOverlay';
   import propsMixin from '../mixins/props';
 
   export default {
-    mixins: [layerMixin, divOverlayMixin, propsMixin],
+    mixins: [divOverlayMixin, propsMixin],
     inject: ['getMap'],
     props: {
       pane: {
@@ -76,7 +75,8 @@
     },
     mounted() {
       const options = this.mergeProps({
-        ...this.layerOptions,
+        ...this.divOverlayOptions,
+        pane: this.pane,
         offset: this.offset,
         maxWidth: this.maxWidth,
         minWidth: this.minWidth,

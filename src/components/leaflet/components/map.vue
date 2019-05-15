@@ -134,6 +134,7 @@
         })
       },
       toggleMeasure() {
+        if (!control.linearMeasurement) return;
         if (!this.measureControl) {
           this.measureControl = control.linearMeasurement({
             unitSystem: 'metric',

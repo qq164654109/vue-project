@@ -39,6 +39,10 @@
       closeOnClick: {
         type: Boolean,
         default: true
+      },
+      visible: {
+        type: Boolean,
+        default: true
       }
     },
     mounted() {

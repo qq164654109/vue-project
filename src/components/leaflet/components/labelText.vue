@@ -46,6 +46,10 @@
       limitZoom: {
         type: Number,
         default: null
+      },
+      visible: {
+        type: Boolean,
+        default: true
       }
     },
     mounted() {

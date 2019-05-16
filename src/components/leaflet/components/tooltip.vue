@@ -43,6 +43,10 @@
       pointEvents: {
         type: Boolean,
         default: false
+      },
+      visible: {
+        type: Boolean,
+        default: true
       }
     },
     mounted() {

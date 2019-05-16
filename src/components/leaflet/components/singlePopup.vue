@@ -31,6 +31,10 @@
       maxHeight: {
         type: Number,
         default: null
+      },
+      visible: {
+        type: Boolean,
+        default: true
       }
     },
     methods: {

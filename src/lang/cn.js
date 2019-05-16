@@ -23,7 +23,8 @@ export default {
     toolsCalendarDemo: '日历',
     hightopo: '图扑软件',
     hightopoDrawing: '设计器',
-    hightopoNode: '图元',
+    hightopo2d: '二维',
+    hightopo3d: '三维',
     leaflet: 'Leaflet'
   },
   navbar: {

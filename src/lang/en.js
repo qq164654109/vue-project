@@ -23,7 +23,8 @@ export default {
     toolsCalendarDemo: 'ToolsCalendar Demo',
     hightopo: 'Hightopo',
     hightopoDrawing: 'Hightopo Drawing',
-    hightopoNode: 'Hightopo Node',
+    hightopo2d: 'Hightopo-2D',
+    hightopo3d: 'Hightopo-3D',
     leaflet: 'Leaflet'
   },
   navbar: {

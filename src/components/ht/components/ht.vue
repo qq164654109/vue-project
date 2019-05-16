@@ -5,7 +5,7 @@
 </template>
 
 <script>
-  import './core/ht';
+  import '../../../../static/ht/core/ht';
   export default {
     props: {
       width: {
@@ -38,5 +38,6 @@
 <style lang="scss" scoped>
     #ht {
         position: relative;
+        background-color: #ebebeb;
     }
 </style>

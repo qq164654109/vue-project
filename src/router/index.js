@@ -172,9 +172,14 @@ export const asyncRoutes = [
         component: () => import('@/views/hightopo/drawing')
       },
       {
-        path: '/hightopo/node',
-        name: 'hightopoNode',
-        component: () => import('@/views/hightopo/node')
+        path: '/hightopo/2d',
+        name: 'hightopo2d',
+        component: () => import('@/views/hightopo/2d')
+      },
+      {
+        path: '/hightopo/3d',
+        name: 'hightopo3d',
+        component: () => import('@/views/hightopo/3d')
       }
     ]
   },

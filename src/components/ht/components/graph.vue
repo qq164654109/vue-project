@@ -1,7 +1,9 @@
 <script>
+    import dataModelMixin from '../mixins/dataModel';
     import { capitalizeFirstLetter, objToStyleStr } from "../utils";
 
     export default {
+      mixins: [dataModelMixin],
       inject: ['getHt'],
       props: {
         className: {
@@ -31,6 +33,10 @@
         disabled: {
           type: Boolean,
           default: false
+        },
+        movable: {
+          type: Function,
+          default: () => false
         }
       },
       data() {
@@ -41,10 +47,16 @@
       mounted() {
         this.ht = this.getHt();
         this.instance = new this.ht.graph.GraphView();
+        this.dataModel = this.instance.dm();
 
-        this.instance.setEditable(this.editable);
-        this.instance.setDisabled(this.disabled);
-        this.setEditable();
+        this.setSelectionMode(this.selectionMode);
+        this.dataJson && this.setDataJson(this.dataJson);
+
+        this.setEditable(this.editable);
+        this.setDisabled(this.disabled);
+        this.setMovable(this.movable);
+        this.setSelectable(this.selectable);
+        this.addSelectListener();
 
         const viewStyle = objToStyleStr(this.viewStyle);
         this.view = this.instance.getView();
@@ -73,12 +85,18 @@
         this.parentView.removeChild(this.view);
       },
       methods: {
-        setEditable() {
+        setEditable(newVal, oldVal) {
           if (this.editable.constructor === Function) {
-            this.instance.setEditableFunc(this.editable);
+            this.instance.setEditableFunc(newVal);
           } else {
-            this.instance.setEditable(this.editable)
+            this.instance.setEditable(newVal)
           }
+        },
+        setDisabled(newVal, oldVal) {
+          this.instance.setDisabled(newVal);
+        },
+        setMovable(newVal, oldVal) {
+          this.instance.setMovableFunc(newVal);
         },
         setBorderPosition() {
           const methodName = 'set' + capitalizeFirstLetter(this.borderPosition) + 'View';
